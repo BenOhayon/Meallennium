@@ -15,7 +15,7 @@ public class SplashScreenActivity extends Activity {
             try {
 
                 Thread.sleep(3500);
-                Intent toMainScreen = new Intent(this, MainActivity.class);
+                Intent toMainScreen = new Intent(this, WelcomeScreenActivity.class);
                 startActivity(toMainScreen);
                 finish();
 
