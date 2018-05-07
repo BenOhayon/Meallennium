@@ -1,11 +1,11 @@
 package com.example.ben.meallennium;
 
-import android.app.Activity;
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-public class WelcomeScreenActivity extends Activity implements WelcomeScreenFragment.WelcomeScreenFragmentListener,
+public class WelcomeScreenActivity extends AppCompatActivity implements WelcomeScreenFragment.WelcomeScreenFragmentListener,
         RegisterFragment.RegisterFragmentListener{
 
     @Override
@@ -15,7 +15,7 @@ public class WelcomeScreenActivity extends Activity implements WelcomeScreenFrag
 
         Log.d("buildTest", "inside onCreate() of WelcomeScreenActivity");
         WelcomeScreenFragment welcomeScreenFragment = new WelcomeScreenFragment();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.fragment_welcome_screen_container, welcomeScreenFragment);
         transaction.commit();
     }
@@ -23,7 +23,7 @@ public class WelcomeScreenActivity extends Activity implements WelcomeScreenFrag
     @Override
     public void onRegisterClick() {
         RegisterFragment registerScreenFragment = new RegisterFragment();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_welcome_screen_container, registerScreenFragment);
         transaction.addToBackStack(null);
         transaction.commit();

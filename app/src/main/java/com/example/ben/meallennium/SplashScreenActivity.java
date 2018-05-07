@@ -1,10 +1,10 @@
 package com.example.ben.meallennium;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
-public class SplashScreenActivity extends Activity {
+public class SplashScreenActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
