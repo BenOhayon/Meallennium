@@ -15,17 +15,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
+        app:layout_constraintTop_toBottomOf="@+id/welcomeScreen__Title">
 
         <Button
-            android:id="@+id/welcomeScreenFragment__registrationButton"
+            android:id="@+id/welcomeScreen__registrationButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Registration" />
 
         <Button
-            android:id="@+id/welcomeScreenFragment__loginButton"
+            android:id="@+id/welcomeScreen__loginButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -33,10 +33,10 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/welcomeScreen__Title"
         android:layout_width="230dp"
         android:layout_height="58dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="22dp"
         android:fontFamily="cursive"
         android:text="Meallennium"
         android:textAlignment="center"
