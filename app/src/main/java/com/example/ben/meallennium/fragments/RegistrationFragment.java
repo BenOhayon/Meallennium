@@ -1,4 +1,4 @@
-package com.example.ben.meallennium;
+package com.example.ben.meallennium.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -9,11 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.ben.meallennium.R;
+
 public class RegistrationFragment extends Fragment {
 
     public interface RegisterFragmentListener {
-        void onRestaurantRegisterClick();
-        void onDinnerRegisterClick();
+        void onRestaurantRegisterOptionSelect();
+        void onDinnerRegisterOptionSelect();
     }
 
     private RegisterFragmentListener listener;
@@ -35,13 +37,13 @@ public class RegistrationFragment extends Fragment {
 
         restaurantRegister.setOnClickListener((View v) -> {
             if(listener != null) {
-                listener.onRestaurantRegisterClick();
+                listener.onRestaurantRegisterOptionSelect();
             }
         });
 
         dinnerRegister.setOnClickListener((View v) -> {
             if(listener != null) {
-                listener.onDinnerRegisterClick();
+                listener.onDinnerRegisterOptionSelect();
             }
         });
 

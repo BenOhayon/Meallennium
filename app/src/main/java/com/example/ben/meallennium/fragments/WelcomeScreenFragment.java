@@ -1,4 +1,4 @@
-package com.example.ben.meallennium;
+package com.example.ben.meallennium.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -9,11 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.ben.meallennium.R;
+
 public class WelcomeScreenFragment extends Fragment {
 
     public interface WelcomeScreenFragmentListener {
-        void onRegisterClick();
-        void onLoginClick();
+        void onRegisterOptionSelect();
+        void onLoginOptionSelect();
     }
 
     private WelcomeScreenFragmentListener listener;
@@ -21,8 +23,7 @@ public class WelcomeScreenFragment extends Fragment {
     public WelcomeScreenFragment() {}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_welcome_screen, container, false);
 
@@ -31,10 +32,13 @@ public class WelcomeScreenFragment extends Fragment {
 
         registerButton.setOnClickListener((View v) -> {
             if(listener != null) {
-                Log.d("buildTest", "onRegisterClick() was invoked!");
-                listener.onRegisterClick();
-            } else {
-                Log.d("buildTest", "listener is null");
+                listener.onRegisterOptionSelect();
+            }
+        });
+
+        loginButton.setOnClickListener((View v) -> {
+            if(listener != null) {
+                listener.onLoginOptionSelect();
             }
         });
 
@@ -44,13 +48,11 @@ public class WelcomeScreenFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.d("buildTest", "in onAttach() of WelcomeScreenFragment.");
-
         if(context instanceof WelcomeScreenFragmentListener) {
             listener = (WelcomeScreenFragmentListener)context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement WelcomeScreenFragmentListener interface.");
+                    + " must implement WelcomeScreenFragmentListener");
         }
     }
 
