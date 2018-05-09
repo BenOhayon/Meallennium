@@ -1,14 +1,15 @@
 package com.example.ben.meallennium.activities;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.ben.meallennium.R;
+import com.example.ben.meallennium.fragments.AddNewPostFragment;
 import com.example.ben.meallennium.fragments.PostsListActivityFragment;
 import com.example.ben.meallennium.utils.FragmentTransactions;
 
-public class PostsListActivity extends AppCompatActivity {
+public class PostsListActivity extends AppCompatActivity implements
+        PostsListActivityFragment.PostsListActivityFragmentListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,6 +18,18 @@ public class PostsListActivity extends AppCompatActivity {
 
         PostsListActivityFragment postsListActivityFragment = new PostsListActivityFragment();
         FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_posts_list_container, postsListActivityFragment, false);
+    }
+
+    @Override
+    public void onAddButtonPress() {
+        AddNewPostFragment addNewPostFragment = new AddNewPostFragment();
+        FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_posts_list_container,
+                addNewPostFragment, true);
+    }
+
+    @Override
+    public void onListItemSelect() {
+
     }
 
 }
