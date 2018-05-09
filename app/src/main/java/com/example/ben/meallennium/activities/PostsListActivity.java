@@ -9,7 +9,8 @@ import com.example.ben.meallennium.fragments.PostsListActivityFragment;
 import com.example.ben.meallennium.utils.FragmentTransactions;
 
 public class PostsListActivity extends AppCompatActivity implements
-        PostsListActivityFragment.PostsListActivityFragmentListener {
+        PostsListActivityFragment.PostsListActivityFragmentListener,
+        AddNewPostFragment.AddNewPostFragmentListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +31,17 @@ public class PostsListActivity extends AppCompatActivity implements
     @Override
     public void onListItemSelect() {
 
+    }
+
+    @Override
+    public void onPost() {
+        // TODO add the logic of saving the post details locally and in Firebase in time.
+        getSupportFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void onCancel() {
+        getSupportFragmentManager().popBackStack();
     }
 
 }

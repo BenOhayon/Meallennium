@@ -11,7 +11,7 @@
         android:id="@+id/splashScreen__appIcon"
         android:layout_width="278dp"
         android:layout_height="275dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="42dp"
         android:src="@mipmap/food"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,5 +32,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/splashScreen__appIcon"
-        app:layout_constraintVertical_bias="0.32" />
+        app:layout_constraintVertical_bias="0.47000003" />
 </android.support.constraint.ConstraintLayout>
