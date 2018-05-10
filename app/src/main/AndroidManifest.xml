@@ -30,7 +30,7 @@
         </activity>
         <activity
             android:name=".activities.PostsListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/Theme.AppCompat.Light">
 
         </activity>
     </application>

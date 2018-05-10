@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.fragments.DinnerRegistrationFragment;
+import com.example.ben.meallennium.fragments.LoginFragment;
 import com.example.ben.meallennium.fragments.RegistrationFragment;
 import com.example.ben.meallennium.fragments.RestaurantRegistrationFragment;
 import com.example.ben.meallennium.fragments.WelcomeScreenFragment;
@@ -38,7 +39,8 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
 
     @Override
     public void onLoginOptionSelect() {
-
+        LoginFragment loginFragment = new LoginFragment();
+        FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_welcome_screen_container, loginFragment, true);
     }
 
     @Override
@@ -55,20 +57,23 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
 
     @Override
     public void onRegister() {
-        // TODO append the account saving functionality in time.
-        Intent toPostListActivity = new Intent(this, PostsListActivity.class);
-        startActivity(toPostListActivity);
-        finish();
+        // TODO append the account saving functionality.
+        moveToPostListActivity();
     }
 
     @Override
     public void onLogin() {
-        // TODO append the account authentication in time.
-
+        // TODO append the account authentication.
+        moveToPostListActivity();
     }
 
     @Override
     public void onCancel() {
         getSupportFragmentManager().popBackStack();
+    }
+
+    private void moveToPostListActivity() {
+        Intent toPostListActivity = new Intent(this, PostsListActivity.class);
+        startActivity(toPostListActivity);
     }
 }

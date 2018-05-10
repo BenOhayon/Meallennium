@@ -15,6 +15,7 @@ public class RegistrationFragment extends Fragment {
     public interface RegisterFragmentListener {
         void onRestaurantRegisterOptionSelect();
         void onDinnerRegisterOptionSelect();
+        void onCancel();
     }
 
     private RegisterFragmentListener listener;
@@ -33,6 +34,7 @@ public class RegistrationFragment extends Fragment {
 
         Button restaurantRegister = view.findViewById(R.id.registrationScreen__restaurantRegister);
         Button dinnerRegister = view.findViewById(R.id.registrationScreen__dinnerRegister);
+        Button backButton = view.findViewById(R.id.registrationScreen__backButton);
 
         restaurantRegister.setOnClickListener((View v) -> {
             if(listener != null) {
@@ -44,6 +46,10 @@ public class RegistrationFragment extends Fragment {
             if(listener != null) {
                 listener.onDinnerRegisterOptionSelect();
             }
+        });
+
+        backButton.setOnClickListener((View v) -> {
+            listener.onCancel();
         });
 
         return view;

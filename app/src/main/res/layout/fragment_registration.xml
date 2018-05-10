@@ -9,7 +9,7 @@
 
 
     <TextView
-        android:id="@+id/registrationScreen__title"
+        android:id="@+id/loginScreen__title"
         android:layout_width="222dp"
         android:layout_height="59dp"
         android:layout_marginTop="16dp"
@@ -17,7 +17,8 @@
         android:text="Registration"
         android:textAlignment="center"
         android:textColor="@android:color/black"
-        android:textSize="40sp"
+        android:textSize="34sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -31,7 +32,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/registrationScreen__title">
+        app:layout_constraintTop_toBottomOf="@+id/loginScreen__title">
 
         <Button
             android:id="@+id/registrationScreen__restaurantRegister"
@@ -45,6 +46,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Dinner"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/registrationScreen__backButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Back"
             android:layout_weight="1"/>
     </LinearLayout>
 
