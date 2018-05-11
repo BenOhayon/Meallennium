@@ -10,8 +10,8 @@
 
     <TextView
         android:id="@+id/loginScreen__title"
-        android:layout_width="222dp"
-        android:layout_height="59dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:fontFamily="cursive"
         android:text="Login"
