@@ -4,16 +4,31 @@
     tools:context="com.example.ben.meallennium.activities.PostsListActivity">
 
     <item
-        android:id="@+id/actionMenu__about"
-        android:title="About..."
-        app:showAsAction="withText|ifRoom" />
-    <!--android:icon="@drawable/about"-->
+        android:id="@+id/actionMenu__search"
+        android:title="search menu"
+        android:icon="@drawable/search"
+        app:showAsAction="ifRoom"
+        app:actionViewClass="android.widget.SearchView" />
 
-    <item
-        android:id="@+id/actionMenu__logout"
-        android:title="Logout"
-        app:showAsAction="ifRoom|withText" />
+    <item android:title="Menu"
+        app:showAsAction="always"
+        android:icon="@drawable/more_options">
 
-    <!--android:icon="@drawable/logout1"-->
+        <menu>
+            <item
+                android:id="@+id/actionMenu__about"
+                android:orderInCategory="100"
+                android:icon="@drawable/about"
+                android:title="About..."
+                app:showAsAction="never" />
 
+            <item
+                android:id="@+id/actionMenu__logout"
+                android:orderInCategory="100"
+                android:title="Logout"
+                app:showAsAction="never"
+                android:icon="@drawable/logout1"/>
+
+        </menu>
+    </item>
 </menu>

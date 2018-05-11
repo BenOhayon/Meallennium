@@ -14,11 +14,7 @@
         <activity
             android:name=".activities.SplashScreenActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <meta-data
@@ -30,9 +26,21 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         </activity>
+
         <activity
             android:name=".activities.PostsListActivity"
-            android:theme="@style/Theme.AppCompat.Light">
+            android:theme="@style/Theme.AppCompat.Light"
+            android:launchMode="singleTop">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
 
         </activity>
     </application>

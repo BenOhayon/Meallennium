@@ -15,14 +15,14 @@ public class LogoutConfirmationDialog extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Are you sure you want to logout?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // TODO insert logout logic here.
                         getActivity().finish();
                     }
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                .setPositiveButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
