@@ -5,20 +5,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
 import com.example.ben.meallennium.R;
+import com.example.ben.meallennium.adapters.PostsListAdapter;
 import com.example.ben.meallennium.dialogs.LogoutConfirmationDialog;
 import com.example.ben.meallennium.fragments.AboutFragment;
 import com.example.ben.meallennium.fragments.AddNewPostFragment;
 import com.example.ben.meallennium.fragments.PostsListActivityFragment;
+import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.utils.FragmentTransactions;
 
 public class PostsListActivity extends AppCompatActivity implements
-        PostsListActivityFragment.PostsListActivityFragmentListener,
+        PostsListActivityFragment.PostsListFragmentListener,
         AddNewPostFragment.AddNewPostFragmentListener,
         AboutFragment.AboutFragmentListener {
 
@@ -95,6 +98,11 @@ public class PostsListActivity extends AppCompatActivity implements
         getSupportFragmentManager().popBackStack();
     }
 
+    /**
+     * Handles the action search intent that starts this activity whenever we wish
+     * to perform a search task in the activity.
+     * @param intent The intent to handle.
+     */
     private void handleIntent(Intent intent) {
 
         if(Intent.ACTION_SEARCH.equals(intent.getAction())) {
