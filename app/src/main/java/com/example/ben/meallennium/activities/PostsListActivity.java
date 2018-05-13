@@ -5,11 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.adapters.PostsListAdapter;
@@ -17,13 +16,15 @@ import com.example.ben.meallennium.dialogs.LogoutConfirmationDialog;
 import com.example.ben.meallennium.fragments.AboutFragment;
 import com.example.ben.meallennium.fragments.AddNewPostFragment;
 import com.example.ben.meallennium.fragments.PostsListActivityFragment;
-import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.utils.FragmentTransactions;
 
 public class PostsListActivity extends AppCompatActivity implements
         PostsListActivityFragment.PostsListFragmentListener,
         AddNewPostFragment.AddNewPostFragmentListener,
         AboutFragment.AboutFragmentListener {
+
+    private Toast toast;
+    private PostsListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +43,6 @@ public class PostsListActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onAddButtonPress() {
-        AddNewPostFragment addNewPostFragment = new AddNewPostFragment();
-        FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_posts_list_container,
-                addNewPostFragment, true);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.actionMenu__logout:
@@ -57,8 +51,13 @@ public class PostsListActivity extends AppCompatActivity implements
                 break;
 
             case R.id.actionMenu__about:
-                AboutFragment aboutFragment = new AboutFragment();
-                FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_posts_list_container, aboutFragment, true);
+                Intent toAboutScreen = new Intent(this, AboutActivity.class);
+                startActivity(toAboutScreen);
+                break;
+
+            case R.id.actionMenu__add:
+                Intent toCreatePostScreen = new Intent(this, AddNewPostActivity.class);
+                startActivity(toCreatePostScreen);
                 break;
         }
 
@@ -78,8 +77,15 @@ public class PostsListActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onListItemSelect() {
+    public void onListItemSelect(int clickedItemIndex) {
 
+        if(toast != null) {
+            toast.cancel();
+        }
+
+        String toastMessage = "Item #" + clickedItemIndex + " clicked.";
+        toast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
+        toast.show();
     }
 
     @Override
@@ -108,6 +114,11 @@ public class PostsListActivity extends AppCompatActivity implements
         if(Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             // TODO enter the search logic here.
+
         }
+    }
+
+    public void setAdapter(PostsListAdapter adapter) {
+        this.adapter = adapter;
     }
 }

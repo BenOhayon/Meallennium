@@ -20,7 +20,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     }
 
     private ListItemClickListener listener;
-
     private int numberOfPosts;
 
     public PostsListAdapter(int items, ListItemClickListener listener) {
@@ -48,11 +47,6 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     @Override
     public int getItemCount() {
         return numberOfPosts;
-    }
-
-    public void populateData() {
-        for(int i = 0 ; i < 20 ; i++) {
-        }
     }
 
     public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

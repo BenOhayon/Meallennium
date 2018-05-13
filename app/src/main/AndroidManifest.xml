@@ -2,9 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.ben.meallennium">
 
-    <!-- In order to disable automatic layout invert, remove the attribute:
-    android:supportsRtl. -->
-
+    <!--
+     In order to disable automatic layout invert, remove the attribute:
+    android:supportsRtl.
+    -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/food"
@@ -14,12 +15,11 @@
         <activity
             android:name=".activities.SplashScreenActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <meta-data
@@ -31,19 +31,30 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         </activity>
-
         <activity
             android:name=".activities.PostsListActivity"
-            android:theme="@style/Theme.AppCompat.Light"
-            android:launchMode="singleTop">
-
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.AppCompat.Light">
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
+                <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
 
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
+        </activity>
+
+        <activity
+            android:name=".activities.AddNewPostActivity"
+            android:label="Create a Post"
+            android:theme="@style/Theme.AppCompat.Light">
+
+        </activity>
+
+        <activity
+            android:name=".activities.AboutActivity"
+            android:label="About"
+            android:theme="@style/Theme.AppCompat.Light">
 
         </activity>
     </application>

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.support.design.widget.FloatingActionButton;
 
 import com.example.ben.meallennium.R;
+import com.example.ben.meallennium.activities.PostsListActivity;
 import com.example.ben.meallennium.adapters.PostsListAdapter;
 import com.example.ben.meallennium.model.Model;
 
@@ -23,8 +24,7 @@ public class PostsListActivityFragment extends Fragment implements PostsListAdap
     private RecyclerView postsList;
 
     public interface PostsListFragmentListener {
-        void onAddButtonPress();
-        void onListItemSelect();
+        void onListItemSelect(int clickedItemIndex);
     }
 
     private PostsListFragmentListener listener;
@@ -41,12 +41,8 @@ public class PostsListActivityFragment extends Fragment implements PostsListAdap
         postsList.setLayoutManager(layoutManager);
         postsList.setHasFixedSize(true);
         adapter = new PostsListAdapter(NUM_LIST_ITEMS, this);
+        ((PostsListActivity)getActivity()).setAdapter(adapter);
         postsList.setAdapter(adapter);
-
-        FloatingActionButton fab = view.findViewById(R.id.postsListScreen__fab);
-        fab.setOnClickListener((View v) -> {
-            listener.onAddButtonPress();
-        });
 
         return view;
     }
@@ -71,6 +67,6 @@ public class PostsListActivityFragment extends Fragment implements PostsListAdap
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        listener.onListItemSelect();
+        listener.onListItemSelect(clickedItemIndex);
     }
 }

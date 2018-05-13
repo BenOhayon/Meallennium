@@ -10,6 +10,12 @@
         app:showAsAction="ifRoom"
         app:actionViewClass="android.widget.SearchView" />
 
+    <item
+        android:id="@+id/actionMenu__add"
+        android:title="add new post"
+        android:icon="@drawable/add"
+        app:showAsAction="always" />
+
     <item android:title="Menu"
         app:showAsAction="always"
         android:icon="@drawable/more_options">
