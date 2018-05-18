@@ -8,8 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.ben.meallennium.R;
+import com.example.ben.meallennium.model.entities.Dinner;
 import com.example.ben.meallennium.utils.RegisterControllerListener;
 
 public class DinnerRegistrationFragment extends Fragment {
@@ -25,9 +27,16 @@ public class DinnerRegistrationFragment extends Fragment {
         Button registerButton = view.findViewById(R.id.dinnerRegisterScreen__registerButton);
         Button cancelButton = view.findViewById(R.id.dinnerRegisterScreen__cancelButton);
 
+        EditText emailEt = view.findViewById(R.id.dinnerRegisterScreen__emailEt);
+        EditText passwordEt = view.findViewById(R.id.dinnerRegisterScreen__passwordEt);
+
         registerButton.setOnClickListener((View v) -> {
             if(listener != null) {
-                listener.onRegister();
+                String email = emailEt.getText().toString();
+                String pass = passwordEt.getText().toString();
+
+                Dinner dinner = new Dinner(email, pass);
+                listener.onRegister(dinner);
             }
         });
 

@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.fragments.DinnerRegistrationFragment;
@@ -12,9 +13,12 @@ import com.example.ben.meallennium.fragments.LoginFragment;
 import com.example.ben.meallennium.fragments.RegistrationFragment;
 import com.example.ben.meallennium.fragments.RestaurantRegistrationFragment;
 import com.example.ben.meallennium.fragments.WelcomeScreenFragment;
+import com.example.ben.meallennium.model.Model;
+import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.utils.FragmentTransactions;
 import com.example.ben.meallennium.utils.LoginControllerListener;
 import com.example.ben.meallennium.utils.RegisterControllerListener;
+import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
 public class WelcomeScreenActivity extends AppCompatActivity implements
         WelcomeScreenFragment.WelcomeScreenFragmentListener,
@@ -56,8 +60,9 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onRegister() {
+    public void onRegister(User user) {
         // TODO append the account saving functionality.
+        Model.getModelInstance().addUserToLocalDatabase(user);
         moveToPostListActivity();
     }
 

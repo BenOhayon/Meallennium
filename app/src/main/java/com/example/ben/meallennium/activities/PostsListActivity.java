@@ -16,14 +16,15 @@ import com.example.ben.meallennium.dialogs.LogoutConfirmationDialog;
 import com.example.ben.meallennium.fragments.AboutFragment;
 import com.example.ben.meallennium.fragments.AddNewPostFragment;
 import com.example.ben.meallennium.fragments.PostsListActivityFragment;
+import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.utils.FragmentTransactions;
+import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
 public class PostsListActivity extends AppCompatActivity implements
         PostsListActivityFragment.PostsListFragmentListener,
         AddNewPostFragment.AddNewPostFragmentListener,
         AboutFragment.AboutFragmentListener {
 
-    private Toast toast;
     private PostsListAdapter adapter;
 
     @Override
@@ -78,14 +79,7 @@ public class PostsListActivity extends AppCompatActivity implements
 
     @Override
     public void onListItemSelect(int clickedItemIndex) {
-
-        if(toast != null) {
-            toast.cancel();
-        }
-
-        String toastMessage = "Item #" + clickedItemIndex + " clicked.";
-        toast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
-        toast.show();
+        Model.getModelInstance().popUpAllUsers();
     }
 
     @Override

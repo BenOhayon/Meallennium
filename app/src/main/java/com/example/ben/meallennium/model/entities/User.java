@@ -1,28 +1,40 @@
 package com.example.ben.meallennium.model.entities;
 
+import java.util.Random;
+
 public class User {
 
-    private String username;
-    private int hashedPassword;
+    private static final int ID_LENGTH = 12;
 
-    public User(String username, String password) {
-        this.username = username;
-        this.hashedPassword = calculatePasswordHash(password);
+    private String id;
+    private String hashedPassword;
+
+    public User(String password) {
+        this.id = generateUserId();
+        this.hashedPassword = password;
     }
 
-    public String getUsername() {
-        return username;
+    private String generateUserId() {
+        Random rand = new Random();
+        StringBuilder sb = new StringBuilder();
+
+        for(int i = 0 ; i < ID_LENGTH ; i++) {
+            char c = (char)(rand.nextInt(136) + 40);
+            sb.append(c);
+        }
+
+        return sb.toString();
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getId() {
+        return this.id;
     }
 
-    public int getHashedPassword() {
+    public String getHashedPassword() {
         return hashedPassword;
     }
 
-    public void setHashedPassword(int hashedPassword) {
+    public void setHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
     }
 
