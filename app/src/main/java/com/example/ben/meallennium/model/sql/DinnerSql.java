@@ -29,7 +29,7 @@ public class DinnerSql {
     public static void addUser(User user, SQLiteDatabase db) {
         ContentValues values = new ContentValues();
         values.put(ID_COLUMN, user.getId());
-        values.put(PASSWORD_COLUMN, user.getHashedPassword());
+        values.put(PASSWORD_COLUMN, user.getPassword());
         db.insert(TABLE_NAME, null, values);
     }
 }

@@ -9,12 +9,12 @@
 
     <EditText
         android:id="@+id/restaurantRegisterScreen__restaurantPasswordValidationEt"
-        android:layout_width="159dp"
+        android:layout_width="0dp"
         android:layout_height="39dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:ems="10"
-        android:inputType="textPassword"
+        android:inputType="textPersonName|textPassword"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView5" />
@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="24dp"
         android:text="Validate Password:"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,18 +35,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="24dp"
         android:text="Password:"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintTop_toBottomOf="@+id/textView12" />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="24dp"
         android:text="Restaurant Owner:"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -74,7 +74,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="90dp"
+        android:layout_marginTop="52dp"
         android:text="Restaurant Name:"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -110,20 +110,21 @@
 
     <EditText
         android:id="@+id/restaurantRegisterScreen__restaurantNameEt"
-        android:layout_width="153dp"
+        android:layout_width="0dp"
         android:layout_height="37dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="52dp"
         android:ems="10"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.54"
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/restaurantRegisterScreen__title" />
 
     <EditText
         android:id="@+id/restaurantRegisterScreen__restaurantOwnerEt"
-        android:layout_width="154dp"
+        android:layout_width="0dp"
         android:layout_height="38dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
@@ -131,18 +132,42 @@
         android:inputType="textPersonName"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView3"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.515"
         app:layout_constraintStart_toEndOf="@+id/textView3" />
 
     <EditText
         android:id="@+id/restaurantRegisterScreen__restaurantPasswordEt"
-        android:layout_width="159dp"
+        android:layout_width="0dp"
         android:layout_height="39dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:ems="10"
-        android:inputType="textPassword"
+        android:inputType="textPersonName|textPassword"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView4" />
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:text="Restaurant Email:"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <EditText
+        android:id="@+id/restaurantRegisterScreen__restaurantEmailEt"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:ems="10"
+        android:inputType="textEmailAddress"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textView12"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView12" />
 
 </android.support.constraint.ConstraintLayout>

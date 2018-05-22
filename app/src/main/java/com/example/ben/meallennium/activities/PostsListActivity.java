@@ -8,30 +8,38 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.adapters.PostsListAdapter;
+import com.example.ben.meallennium.dialogs.DeleteAccountConfirmationDialog;
 import com.example.ben.meallennium.dialogs.LogoutConfirmationDialog;
 import com.example.ben.meallennium.fragments.AboutFragment;
 import com.example.ben.meallennium.fragments.AddNewPostFragment;
 import com.example.ben.meallennium.fragments.PostsListActivityFragment;
 import com.example.ben.meallennium.model.Model;
+import com.example.ben.meallennium.model.entities.User;
+import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.utils.FragmentTransactions;
 import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
 public class PostsListActivity extends AppCompatActivity implements
         PostsListActivityFragment.PostsListFragmentListener,
         AddNewPostFragment.AddNewPostFragmentListener,
-        AboutFragment.AboutFragmentListener {
+        AboutFragment.AboutFragmentListener,
+        FirebaseModel.FirebaseUserDataListener {
 
     private PostsListAdapter adapter;
+
+    // --------------------
+    //   CALLBACK METHODS
+    // --------------------
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posts_list);
 
+        Model.instnace.setListenerForFirebaseUserData(this);
         handleIntent(getIntent());
 
         PostsListActivityFragment postsListActivityFragment = new PostsListActivityFragment();
@@ -47,7 +55,6 @@ public class PostsListActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.actionMenu__logout:
-                // TODO insert the logout logic.
                 new LogoutConfirmationDialog().show(getSupportFragmentManager(), "TAG");
                 break;
 
@@ -59,6 +66,10 @@ public class PostsListActivity extends AppCompatActivity implements
             case R.id.actionMenu__add:
                 Intent toCreatePostScreen = new Intent(this, AddNewPostActivity.class);
                 startActivity(toCreatePostScreen);
+                break;
+
+            case R.id.actionMenu__deleteAccount:
+                new DeleteAccountConfirmationDialog().show(getSupportFragmentManager(), "TAG");
                 break;
         }
 
@@ -77,9 +88,13 @@ public class PostsListActivity extends AppCompatActivity implements
         return true;
     }
 
+    // --------------------
+    //   LISTENER METHODS
+    // --------------------
+
     @Override
     public void onListItemSelect(int clickedItemIndex) {
-        Model.getModelInstance().popUpAllUsers();
+        Model.instnace.popUpAllUsers();
     }
 
     @Override
@@ -97,6 +112,17 @@ public class PostsListActivity extends AppCompatActivity implements
     public void onOKPressed() {
         getSupportFragmentManager().popBackStack();
     }
+
+    @Override
+    public void onDeleteUser(User user) {
+        Model.instnace.setSignedInUserInFirebase(null);
+        ToastMessageDisplayer.displayToast(this, "The user was deleted.");
+        finish();
+    }
+
+    // ----------------------------
+    //   PRIVATE & PUBLIC METHODS
+    // ----------------------------
 
     /**
      * Handles the action search intent that starts this activity whenever we wish

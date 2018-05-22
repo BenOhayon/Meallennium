@@ -15,26 +15,38 @@
         android:icon="@drawable/more_options">
 
         <menu>
-            <item
-                android:id="@+id/actionMenu__add"
-                android:title="Add New Post"
-                android:icon="@drawable/add"
-                app:showAsAction="never" />
+            <group
+                android:id="@+id/group1">
+                <item
+                    android:id="@+id/actionMenu__add"
+                    android:title="Add New Post"
+                    android:icon="@drawable/add"
+                    app:showAsAction="never" />
 
-            <item
-                android:id="@+id/actionMenu__about"
-                android:orderInCategory="100"
-                android:icon="@drawable/about"
-                android:title="About"
-                app:showAsAction="never" />
+                <item
+                    android:id="@+id/actionMenu__about"
+                    android:orderInCategory="100"
+                    android:icon="@drawable/about"
+                    android:title="About"
+                    app:showAsAction="never" />
 
-            <item
-                android:id="@+id/actionMenu__logout"
-                android:orderInCategory="100"
-                android:title="Logout"
-                app:showAsAction="never"
-                android:icon="@drawable/logout1"/>
+                <item
+                    android:id="@+id/actionMenu__logout"
+                    android:orderInCategory="100"
+                    android:title="Logout"
+                    app:showAsAction="never"
+                    android:icon="@drawable/logout1"/>
+            </group>
 
+            <group
+                android:id="@+id/group2">
+                <item
+                    android:id="@+id/actionMenu__deleteAccount"
+                    android:orderInCategory="100"
+                    android:title="Delete Account"
+                    app:showAsAction="never"
+                    android:icon="@drawable/trash"/>
+            </group>
         </menu>
     </item>
 </menu>

@@ -1,5 +1,6 @@
 package com.example.ben.meallennium.dialogs;
 
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -9,18 +10,17 @@ import android.support.v4.app.DialogFragment;
 
 import com.example.ben.meallennium.model.Model;
 
-public class LogoutConfirmationDialog extends DialogFragment {
-
+public class DeleteAccountConfirmationDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("Are you sure you want to logout?")
+        builder.setMessage("Are you sure you want to delete the account?")
                 .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Model.instnace.signOutCurrentUserFromFirebase();
+                        Model.instnace.deleteSignedInUserInFirebase();
                         getActivity().finish();
                     }
                 })

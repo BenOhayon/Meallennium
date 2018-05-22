@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +17,9 @@ import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.activities.PostsListActivity;
 import com.example.ben.meallennium.adapters.PostsListAdapter;
 import com.example.ben.meallennium.model.Model;
+import com.example.ben.meallennium.utils.ToastMessageDisplayer;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class PostsListActivityFragment extends Fragment implements PostsListAdapter.ListItemClickListener {
 

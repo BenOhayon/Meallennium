@@ -7,10 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.example.ben.meallennium.activities.MeallenniumApplicationActivity;
 import com.example.ben.meallennium.model.entities.Dinner;
 import com.example.ben.meallennium.model.entities.User;
-import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
 public class SqlModel {
 
@@ -29,7 +27,7 @@ public class SqlModel {
 
         if(user instanceof Dinner) {
             values.put(DinnerSql.ID_COLUMN, user.getId());
-            values.put(DinnerSql.PASSWORD_COLUMN, user.getHashedPassword());
+            values.put(DinnerSql.PASSWORD_COLUMN, user.getPassword());
             values.put(DinnerSql.EMAIL_COLUMN, ((Dinner) user).getEmail());
         }
 

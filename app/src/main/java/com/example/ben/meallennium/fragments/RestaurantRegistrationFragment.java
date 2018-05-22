@@ -12,6 +12,7 @@ import android.widget.EditText;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.model.entities.Restaurant;
+import com.example.ben.meallennium.utils.FieldVerifier;
 import com.example.ben.meallennium.utils.RegisterControllerListener;
 
 public class RestaurantRegistrationFragment extends Fragment {
@@ -31,14 +32,29 @@ public class RestaurantRegistrationFragment extends Fragment {
         EditText restaurantNameEt = view.findViewById(R.id.restaurantRegisterScreen__restaurantNameEt);
         EditText restaurantOwnerEt = view.findViewById(R.id.restaurantRegisterScreen__restaurantOwnerEt);
         EditText restaurantPasswordEt = view.findViewById(R.id.restaurantRegisterScreen__restaurantPasswordEt);
+        EditText restaurantVerifyPasswordEt = view.findViewById(R.id.restaurantRegisterScreen__restaurantPasswordValidationEt);
+        EditText restaurantEmailEt = view.findViewById(R.id.restaurantRegisterScreen__restaurantEmailEt);
 
         registerButton.setOnClickListener((View v) -> {
             if(listener != null) {
                 String name = restaurantNameEt.getText().toString();
                 String owner = restaurantOwnerEt.getText().toString();
                 String password = restaurantPasswordEt.getText().toString();
-                Restaurant restaurant = new Restaurant(name, owner, password);
-                listener.onRegister(restaurant);
+                String email = restaurantEmailEt.getText().toString();
+                String verifiedPassword = restaurantVerifyPasswordEt.getText().toString();
+
+                if(FieldVerifier.areVerifiedFields(email, password, verifiedPassword)) {
+                    Restaurant restaurant = new Restaurant(name, owner, email, password);
+                    listener.onRegister(restaurant);
+                } else {
+                    listener.onError();
+                }
+
+                restaurantNameEt.setText("");
+                restaurantOwnerEt.setText("");
+                restaurantPasswordEt.setText("");
+                restaurantEmailEt.setText("");
+                restaurantVerifyPasswordEt.setText("");
             }
         });
 

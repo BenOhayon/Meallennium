@@ -7,11 +7,13 @@ public class User {
     private static final int ID_LENGTH = 12;
 
     private String id;
-    private String hashedPassword;
+    private String password;
+    private String email;
 
-    public User(String password) {
+    public User(String email, String password) {
         this.id = generateUserId();
-        this.hashedPassword = password;
+        this.email = email;
+        this.password = password;
     }
 
     private String generateUserId() {
@@ -26,27 +28,35 @@ public class User {
         return sb.toString();
     }
 
+    public String extractUsernameFromEmail() {
+        StringBuilder sb = new StringBuilder();
+
+        int i = 0;
+        while(i < email.length() && email.charAt(i) != '@') {
+            sb.append(email.charAt(i));
+            i++;
+        }
+
+        return sb.toString();
+    }
+
     public String getId() {
         return this.id;
     }
 
-    public String getHashedPassword() {
-        return hashedPassword;
+    public String getPassword() {
+        return password;
     }
 
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
+    public String getEmail() {
+        return email;
     }
 
-    private int calculatePasswordHash(String password) {
-        byte[] bytes = new byte[password.length()];
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-        for(int i = 0 ; i < bytes.length ; i++) {
-            bytes[i] = (byte) password.charAt(i);
-        }
-
-        // TODO complete the hashing logic.
-
-        return 0;
+    public String toString() {
+        return this.id + "," + this.password;
     }
 }

@@ -1,11 +1,8 @@
 package com.example.ben.meallennium.activities;
 
 import android.content.Intent;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.fragments.DinnerRegistrationFragment;
@@ -15,6 +12,7 @@ import com.example.ben.meallennium.fragments.RestaurantRegistrationFragment;
 import com.example.ben.meallennium.fragments.WelcomeScreenFragment;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.User;
+import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.utils.FragmentTransactions;
 import com.example.ben.meallennium.utils.LoginControllerListener;
 import com.example.ben.meallennium.utils.RegisterControllerListener;
@@ -24,16 +22,36 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
         WelcomeScreenFragment.WelcomeScreenFragmentListener,
         RegistrationFragment.RegisterFragmentListener,
         RegisterControllerListener,
-        LoginControllerListener {
+        LoginControllerListener, FirebaseModel.FirebaseUserAuthListener {
+
+
+    // --------------------
+    //   CALLBACK METHODS
+    // --------------------
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome_screen);
 
+        Model.instnace.setListenerForFirebaseModel(this);
+
         WelcomeScreenFragment welcomeScreenFragment = new WelcomeScreenFragment();
         FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_welcome_screen_container, welcomeScreenFragment, false);
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        if(Model.instnace.isSignedInUserInFirebase()) {
+            moveToPostListActivity();
+        }
+    }
+
+    // --------------------
+    //   LISTENER METHODS
+    // --------------------
 
     @Override
     public void onRegisterOptionSelect() {
@@ -61,15 +79,12 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
 
     @Override
     public void onRegister(User user) {
-        // TODO append the account saving functionality.
-        Model.getModelInstance().addUserToLocalDatabase(user);
-        moveToPostListActivity();
+        Model.instnace.addUserToFirebase(user);
     }
 
     @Override
-    public void onLogin() {
-        // TODO append the account authentication.
-        moveToPostListActivity();
+    public void onLogin(User user) {
+        Model.instnace.signInUserToFirebase(user);
     }
 
     @Override
@@ -77,6 +92,39 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
         getSupportFragmentManager().popBackStack();
     }
 
+    @Override
+    public void onCreateUserSuccess(User user) {
+        Model.instnace.setSignedInUserInFirebase(user);
+        ToastMessageDisplayer.displayToast(this, "The user " + user + " signed up!");
+        moveToPostListActivity();
+    }
+
+    @Override
+    public void onCreateUserFailure(User user) {
+        ToastMessageDisplayer.displayToast(this, "Failed to sign up user");
+    }
+
+    @Override
+    public void onSignInUserSuccess(User user) {
+        Model.instnace.setSignedInUserInFirebase(user);
+        ToastMessageDisplayer.displayToast(this, "A user has signed in!");
+        moveToPostListActivity();
+    }
+
+    @Override
+    public void onSignInUserFailure(User user) {
+        ToastMessageDisplayer.displayToast(this, "Failed to sign in user");
+    }
+
+    @Override
+    public void onError() {
+        ToastMessageDisplayer.displayToast(this, "Invalid fields");
+    }
+
+
+    // --------------------
+    //   PRIVATE METHODS
+    // --------------------
     private void moveToPostListActivity() {
         Intent toPostListActivity = new Intent(this, PostsListActivity.class);
         startActivity(toPostListActivity);

@@ -5,8 +5,8 @@ public class Restaurant extends User {
     private String restaurantName;
     private String owner;
 
-    public Restaurant(String restaurantName, String owner, String password) {
-        super(password);
+    public Restaurant(String restaurantName, String owner, String email, String password) {
+        super(email, password);
         this.restaurantName = restaurantName;
         this.owner = owner;
     }
