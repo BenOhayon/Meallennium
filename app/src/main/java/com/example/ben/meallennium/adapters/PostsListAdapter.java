@@ -5,13 +5,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
-import com.example.ben.meallennium.model.Model;
-import com.example.ben.meallennium.model.entities.User;
-
-import java.util.List;
 
 public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostViewHolder> {
 
@@ -34,9 +31,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.posts_list_item,
                 parent, false);
 
-        PostViewHolder postViewHolder = new PostViewHolder(view);
-
-        return postViewHolder;
+        return new PostViewHolder(view);
     }
 
     @Override
@@ -51,11 +46,13 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
     public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView postItemName;
+        ImageView postImage;
 
         public PostViewHolder(View itemView) {
             super(itemView);
 
-            postItemName = itemView.findViewById(R.id.postItem__name);
+            postItemName = itemView.findViewById(R.id.postItem_name);
+            postImage = itemView.findViewById(R.id.postItem_image);
             itemView.setOnClickListener(this);
         }
 

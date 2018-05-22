@@ -15,7 +15,7 @@ import com.example.ben.meallennium.dialogs.DeleteAccountConfirmationDialog;
 import com.example.ben.meallennium.dialogs.LogoutConfirmationDialog;
 import com.example.ben.meallennium.fragments.AboutFragment;
 import com.example.ben.meallennium.fragments.AddNewPostFragment;
-import com.example.ben.meallennium.fragments.PostsListActivityFragment;
+import com.example.ben.meallennium.fragments.PostsListFragment;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
@@ -23,7 +23,7 @@ import com.example.ben.meallennium.utils.FragmentTransactions;
 import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
 public class PostsListActivity extends AppCompatActivity implements
-        PostsListActivityFragment.PostsListFragmentListener,
+        PostsListFragment.PostsListFragmentListener,
         AddNewPostFragment.AddNewPostFragmentListener,
         AboutFragment.AboutFragmentListener,
         FirebaseModel.FirebaseUserDataListener {
@@ -42,8 +42,8 @@ public class PostsListActivity extends AppCompatActivity implements
         Model.instnace.setListenerForFirebaseUserData(this);
         handleIntent(getIntent());
 
-        PostsListActivityFragment postsListActivityFragment = new PostsListActivityFragment();
-        FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_posts_list_container, postsListActivityFragment, false);
+        PostsListFragment postsListFragment = new PostsListFragment();
+        FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_posts_list_container, postsListFragment, false);
     }
 
     @Override

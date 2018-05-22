@@ -17,11 +17,14 @@ import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.activities.PostsListActivity;
 import com.example.ben.meallennium.adapters.PostsListAdapter;
 import com.example.ben.meallennium.model.Model;
+import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class PostsListActivityFragment extends Fragment implements PostsListAdapter.ListItemClickListener {
+import java.util.List;
+
+public class PostsListFragment extends Fragment implements PostsListAdapter.ListItemClickListener {
 
     private static final int NUM_LIST_ITEMS = 20;
     private PostsListAdapter adapter;
@@ -33,7 +36,14 @@ public class PostsListActivityFragment extends Fragment implements PostsListAdap
 
     private PostsListFragmentListener listener;
 
-    public PostsListActivityFragment() {}
+    public PostsListFragment() {}
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // TODO Complete the posts fetching logic
+//        Model.instnace.fetchPostsDataFromFirebase();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,7 +55,7 @@ public class PostsListActivityFragment extends Fragment implements PostsListAdap
         postsList.setLayoutManager(layoutManager);
         postsList.setHasFixedSize(true);
         adapter = new PostsListAdapter(NUM_LIST_ITEMS, this);
-        ((PostsListActivity)getActivity()).setAdapter(adapter);
+//        ((PostsListActivity)getActivity()).setAdapter(adapter);
         postsList.setAdapter(adapter);
 
         return view;
@@ -59,7 +69,7 @@ public class PostsListActivityFragment extends Fragment implements PostsListAdap
             listener = (PostsListFragmentListener ) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement PostsListActivityFragmentListener");
+                    + " must implement PostsListFragmentListener");
         }
     }
 
