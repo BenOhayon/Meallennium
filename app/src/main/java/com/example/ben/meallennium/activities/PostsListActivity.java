@@ -39,7 +39,7 @@ public class PostsListActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posts_list);
 
-        Model.instnace.setListenerForFirebaseUserData(this);
+        Model.instance.setListenerForFirebaseUserData(this);
         handleIntent(getIntent());
 
         PostsListFragment postsListFragment = new PostsListFragment();
@@ -94,7 +94,7 @@ public class PostsListActivity extends AppCompatActivity implements
 
     @Override
     public void onListItemSelect(int clickedItemIndex) {
-        Model.instnace.popUpAllUsers();
+        Model.instance.popUpAllUsers();
     }
 
     @Override
@@ -115,7 +115,7 @@ public class PostsListActivity extends AppCompatActivity implements
 
     @Override
     public void onDeleteUser(User user) {
-        Model.instnace.setSignedInUserInFirebase(null);
+        Model.instance.setSignedInUserInFirebase(null);
         ToastMessageDisplayer.displayToast(this, "The user was deleted.");
         finish();
     }

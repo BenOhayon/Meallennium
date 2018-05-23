@@ -20,7 +20,7 @@ public class LogoutConfirmationDialog extends DialogFragment {
                 .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Model.instnace.signOutCurrentUserFromFirebase();
+                        Model.instance.signOutCurrentUserFromFirebase();
                         getActivity().finish();
                     }
                 })

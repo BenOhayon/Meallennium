@@ -1,9 +1,7 @@
 package com.example.ben.meallennium.model;
 
-import android.content.SharedPreferences;
-
 import com.example.ben.meallennium.activities.MeallenniumApplication;
-import com.example.ben.meallennium.activities.PostsListActivity;
+import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.model.sql.SqlModel;
@@ -13,13 +11,17 @@ import java.util.List;
 
 public class Model {
 
-    public static Model instnace = new Model();
-    private List<User> usersData;
+    public static Model instance = new Model();
+    private List<Post> postsData;
     private SqlModel sqlModel;
     private FirebaseModel firebaseModel;
 
     private Model() {
-        this.usersData = new ArrayList<>();
+        this.postsData = new ArrayList<>();
+        for(int i = 0 ; i < 5 ; i++) {
+            postsData.add(new Post("Post" + (i+1), "Description for post " + (i+1)));
+        }
+
         sqlModel = new SqlModel(MeallenniumApplication.context);
         firebaseModel = new FirebaseModel();
     }
@@ -32,8 +34,8 @@ public class Model {
         sqlModel.addUserEntry(user);
     }
 
-    public int getNumberOfUsers() {
-        return usersData.size();
+    public int getNumberOfPosts() {
+        return postsData.size();
     }
 
     public void popUpAllUsers() {
@@ -66,5 +68,14 @@ public class Model {
 
     public void setSignedInUserInFirebase(User user) {
         firebaseModel.setSignedInUser(user);
+    }
+
+    public void fetchAllPostsDataFromFirebase() {
+        firebaseModel.fetchAllPostsData();
+    }
+
+    public void savePostsInFirebase() {
+        // TODO complete the logic of saving the posts from the Model.
+//        firebaseModel.savePosts
     }
 }

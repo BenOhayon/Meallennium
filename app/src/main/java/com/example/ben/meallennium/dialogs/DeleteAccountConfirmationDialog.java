@@ -20,7 +20,7 @@ public class DeleteAccountConfirmationDialog extends DialogFragment {
                 .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Model.instnace.deleteSignedInUserInFirebase();
+                        Model.instance.deleteSignedInUserInFirebase();
                         getActivity().finish();
                     }
                 })

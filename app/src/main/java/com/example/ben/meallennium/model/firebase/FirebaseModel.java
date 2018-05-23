@@ -13,8 +13,27 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class FirebaseModel {
+
+    public void fetchAllPostsData() {
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     public interface FirebaseUserAuthListener {
         void onCreateUserSuccess(User user);
@@ -30,10 +49,12 @@ public class FirebaseModel {
     private FirebaseUserAuthListener firebaseUserAuthListener;
     private FirebaseUserDataListener firebaseUserDataListener;
     private FirebaseAuth auth;
+    private DatabaseReference dbRef;
     private User signedInUser;
 
     public FirebaseModel() {
         auth = FirebaseAuth.getInstance();
+        dbRef = FirebaseDatabase.getInstance().getReference();
     }
 
     public void setFirebaseUserAuthListener(FirebaseUserAuthListener firebaseUserAuthListener) {

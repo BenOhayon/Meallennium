@@ -34,7 +34,7 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome_screen);
 
-        Model.instnace.setListenerForFirebaseModel(this);
+        Model.instance.setListenerForFirebaseModel(this);
 
         WelcomeScreenFragment welcomeScreenFragment = new WelcomeScreenFragment();
         FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_welcome_screen_container, welcomeScreenFragment, false);
@@ -44,7 +44,7 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
     public void onStart() {
         super.onStart();
 
-        if(Model.instnace.isSignedInUserInFirebase()) {
+        if(Model.instance.isSignedInUserInFirebase()) {
             moveToPostListActivity();
         }
     }
@@ -79,12 +79,12 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
 
     @Override
     public void onRegister(User user) {
-        Model.instnace.addUserToFirebase(user);
+        Model.instance.addUserToFirebase(user);
     }
 
     @Override
     public void onLogin(User user) {
-        Model.instnace.signInUserToFirebase(user);
+        Model.instance.signInUserToFirebase(user);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
 
     @Override
     public void onCreateUserSuccess(User user) {
-        Model.instnace.setSignedInUserInFirebase(user);
+        Model.instance.setSignedInUserInFirebase(user);
         ToastMessageDisplayer.displayToast(this, "The user " + user + " signed up!");
         moveToPostListActivity();
     }
@@ -106,7 +106,7 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
 
     @Override
     public void onSignInUserSuccess(User user) {
-        Model.instnace.setSignedInUserInFirebase(user);
+        Model.instance.setSignedInUserInFirebase(user);
         ToastMessageDisplayer.displayToast(this, "A user has signed in!");
         moveToPostListActivity();
     }
