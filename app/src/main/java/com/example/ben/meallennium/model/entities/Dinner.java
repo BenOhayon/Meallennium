@@ -13,7 +13,17 @@ public class Dinner extends User {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    private String extractUsernameFromEmail() {
+        StringBuilder sb = new StringBuilder();
+
+        int i = 0;
+        String email = getEmail();
+
+        while(i < email.length() && email.charAt(i) != '@') {
+            sb.append(email.charAt(i));
+            i++;
+        }
+
+        return sb.toString();
     }
 }

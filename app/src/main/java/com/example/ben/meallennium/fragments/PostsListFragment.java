@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +13,31 @@ import android.view.ViewGroup;
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.adapters.PostsListAdapter;
 import com.example.ben.meallennium.model.Model;
+import com.example.ben.meallennium.model.entities.Post;
+import com.example.ben.meallennium.model.firebase.FirebaseModel;
 
-public class PostsListFragment extends Fragment implements PostsListAdapter.ListItemClickListener {
+import java.util.List;
 
-    private static final int NUM_LIST_ITEMS = 20;
+public class PostsListFragment extends Fragment implements
+        PostsListAdapter.ListItemClickListener,
+        FirebaseModel.FirebaseDataManagerListener {
+
     private PostsListAdapter adapter;
     private RecyclerView postsList;
+
+    @Override
+    public void onFetchAllPosts(List<Post> posts) {
+        adapter.setPosts(posts);
+        adapter.notifyDataSetChanged();
+
+        // TODO Fix the bug in refreshing the list by the adapter.
+    }
+
+    @Override
+    public void onCreateNewPost(Post post) {
+        adapter.getPosts().add(post);
+        adapter.notifyDataSetChanged();
+    }
 
     public interface PostsListFragmentListener {
         void onListItemSelect(int clickedItemIndex);
@@ -30,9 +50,8 @@ public class PostsListFragment extends Fragment implements PostsListAdapter.List
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // TODO Complete the posts fetching logic
-//        Model.instance.fetchAllPostsDataFromFirebase();
-        Model.instance.savePostsInFirebase();
+        Model.instance.setListenerForFirebaseDataManager(this);
+        Model.instance.fetchAllPostsDataFromFirebase();
     }
 
     @Override
@@ -44,8 +63,7 @@ public class PostsListFragment extends Fragment implements PostsListAdapter.List
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         postsList.setLayoutManager(layoutManager);
         postsList.setHasFixedSize(true);
-        adapter = new PostsListAdapter(NUM_LIST_ITEMS, this);
-//        ((PostsListActivity)getActivity()).setAdapter(adapter);
+        adapter = new PostsListAdapter(this);
         postsList.setAdapter(adapter);
 
         return view;

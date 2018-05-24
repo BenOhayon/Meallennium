@@ -23,7 +23,7 @@ public class Post {
         StringBuilder sb = new StringBuilder();
 
         for(int i = 0 ; i < ID_LENGTH ; i++) {
-            char c = (char)(rand.nextInt('9' - '0') + '0');
+            int c = rand.nextInt(10);
             sb.append(c);
         }
 

@@ -35,6 +35,7 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_welcome_screen);
 
         Model.instance.setListenerForFirebaseModel(this);
+//        Model.instance.savePostsInFirebase();
 
         WelcomeScreenFragment welcomeScreenFragment = new WelcomeScreenFragment();
         FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_welcome_screen_container, welcomeScreenFragment, false);

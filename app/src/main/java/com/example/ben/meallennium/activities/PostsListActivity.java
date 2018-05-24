@@ -17,6 +17,7 @@ import com.example.ben.meallennium.fragments.AboutFragment;
 import com.example.ben.meallennium.fragments.AddNewPostFragment;
 import com.example.ben.meallennium.fragments.PostsListFragment;
 import com.example.ben.meallennium.model.Model;
+import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.utils.FragmentTransactions;
@@ -25,8 +26,7 @@ import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 public class PostsListActivity extends AppCompatActivity implements
         PostsListFragment.PostsListFragmentListener,
         AddNewPostFragment.AddNewPostFragmentListener,
-        AboutFragment.AboutFragmentListener,
-        FirebaseModel.FirebaseUserDataListener {
+        AboutFragment.AboutFragmentListener, FirebaseModel.FirebaseUserDeleterListener {
 
     private PostsListAdapter adapter;
 
@@ -39,7 +39,7 @@ public class PostsListActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posts_list);
 
-        Model.instance.setListenerForFirebaseUserData(this);
+        Model.instance.setListenerForFirebaseUserDeleter(this);
         handleIntent(getIntent());
 
         PostsListFragment postsListFragment = new PostsListFragment();
@@ -98,8 +98,8 @@ public class PostsListActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onPost() {
-        // TODO add the logic of saving the post details locally and in Firebase.
+    public void onPost(Post post) {
+        Model.instance.addPostToFirebase(post);
         getSupportFragmentManager().popBackStack();
     }
 

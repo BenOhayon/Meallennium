@@ -9,6 +9,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
+import com.example.ben.meallennium.model.entities.Post;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostViewHolder> {
 
@@ -17,11 +21,15 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
     }
 
     private ListItemClickListener listener;
-    private int numberOfPosts;
+    private List<Post> posts;
 
-    public PostsListAdapter(int items, ListItemClickListener listener) {
-        numberOfPosts = items;
+    public PostsListAdapter(ListItemClickListener listener) {
+        posts = new LinkedList<>();
         this.listener = listener;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
     }
 
     @NonNull
@@ -41,7 +49,11 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
     @Override
     public int getItemCount() {
-        return numberOfPosts;
+        return posts.size();
+    }
+
+    public List<Post> getPosts() {
+        return this.posts;
     }
 
     public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -56,8 +68,8 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
             itemView.setOnClickListener(this);
         }
 
-        public void bind(int listIndex) {
-            postItemName.setText(String.valueOf(listIndex));
+        private void bind(int listIndex) {
+            postItemName.setText(posts.get(listIndex).getName());
         }
 
         @Override

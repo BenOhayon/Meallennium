@@ -1,10 +1,9 @@
 package com.example.ben.meallennium.model.firebase;
 
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.example.ben.meallennium.model.Model;
+import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -19,18 +18,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class FirebaseModel {
 
-    public void fetchAllPostsData() {
-        dbRef.addValueEventListener(new ValueEventListener() {
+    public void createNewPost(Post post) {
+        DatabaseReference postsRef = dbRef.child("Posts").child(post.getId());
+        postsRef.setValue(post, new DatabaseReference.CompletionListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                firebaseDataManagerListener.onCreateNewPost(post);
             }
         });
     }
@@ -42,12 +40,18 @@ public class FirebaseModel {
         void onSignInUserFailure(User user);
     }
 
-    public interface FirebaseUserDataListener {
+    public interface FirebaseUserDeleterListener {
         void onDeleteUser(User user);
     }
 
+    public interface FirebaseDataManagerListener {
+        void onFetchAllPosts(List<Post> posts);
+        void onCreateNewPost(Post post);
+    }
+
     private FirebaseUserAuthListener firebaseUserAuthListener;
-    private FirebaseUserDataListener firebaseUserDataListener;
+    private FirebaseUserDeleterListener firebaseUserDeleterListener;
+    private FirebaseDataManagerListener firebaseDataManagerListener;
     private FirebaseAuth auth;
     private DatabaseReference dbRef;
     private User signedInUser;
@@ -61,8 +65,12 @@ public class FirebaseModel {
         this.firebaseUserAuthListener = firebaseUserAuthListener;
     }
 
-    public void setFirebaseUserDataListener(FirebaseUserDataListener firebaseUserDataListener) {
-        this.firebaseUserDataListener = firebaseUserDataListener;
+    public void setFirebaseUserDeleterListener(FirebaseUserDeleterListener firebaseUserDeleterListener) {
+        this.firebaseUserDeleterListener = firebaseUserDeleterListener;
+    }
+
+    public void setFirebaseDataManagerListener(FirebaseDataManagerListener firebaseDataManagerListener) {
+        this.firebaseDataManagerListener = firebaseDataManagerListener;
     }
 
     public void setSignedInUser(User user) {
@@ -112,7 +120,7 @@ public class FirebaseModel {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
                         Log.d("buildTest", "User account deleted.");
-                        firebaseUserDataListener.onDeleteUser(signedInUser);
+                        firebaseUserDeleterListener.onDeleteUser(signedInUser);
                     }
                 }
             });
@@ -126,5 +134,26 @@ public class FirebaseModel {
 
     public void signOutCurrentUser() {
         auth.signOut();
+    }
+
+    public void fetchAllPostsData() {
+        DatabaseReference postsRef = dbRef.child("Posts");
+        postsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Post> posts = new LinkedList<>();
+                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Post post = postSnapshot.getValue(Post.class);
+                    posts.add(post);
+                }
+
+                firebaseDataManagerListener.onFetchAllPosts(posts);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }

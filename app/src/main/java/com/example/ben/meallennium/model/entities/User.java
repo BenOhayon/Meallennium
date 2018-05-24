@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class User {
 
-    private static final int ID_LENGTH = 12;
+    private static final int ID_LENGTH = 7;
 
     private String id;
     private String password;
@@ -21,20 +21,8 @@ public class User {
         StringBuilder sb = new StringBuilder();
 
         for(int i = 0 ; i < ID_LENGTH ; i++) {
-            char c = (char)(rand.nextInt(136) + 40);
+            int c = rand.nextInt(10);
             sb.append(c);
-        }
-
-        return sb.toString();
-    }
-
-    public String extractUsernameFromEmail() {
-        StringBuilder sb = new StringBuilder();
-
-        int i = 0;
-        while(i < email.length() && email.charAt(i) != '@') {
-            sb.append(email.charAt(i));
-            i++;
         }
 
         return sb.toString();

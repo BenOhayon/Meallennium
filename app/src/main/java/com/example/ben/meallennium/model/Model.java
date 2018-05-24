@@ -7,6 +7,7 @@ import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.model.sql.SqlModel;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Model {
@@ -17,11 +18,7 @@ public class Model {
     private FirebaseModel firebaseModel;
 
     private Model() {
-        this.postsData = new ArrayList<>();
-        for(int i = 0 ; i < 5 ; i++) {
-            postsData.add(new Post("Post" + (i+1), "Description for post " + (i+1)));
-        }
-
+        postsData = new LinkedList<>();
         sqlModel = new SqlModel(MeallenniumApplication.context);
         firebaseModel = new FirebaseModel();
     }
@@ -32,6 +29,10 @@ public class Model {
 
     public void addUserToLocalDatabase(User user) {
         sqlModel.addUserEntry(user);
+    }
+
+    public void setPostsData(List<Post> list) {
+        this.postsData = list;
     }
 
     public int getNumberOfPosts() {
@@ -62,8 +63,8 @@ public class Model {
         firebaseModel.deleteSignedInUser();
     }
 
-    public void setListenerForFirebaseUserData(FirebaseModel.FirebaseUserDataListener listenerForFirebaseUserData) {
-        firebaseModel.setFirebaseUserDataListener(listenerForFirebaseUserData);
+    public void setListenerForFirebaseUserDeleter(FirebaseModel.FirebaseUserDeleterListener listenerForFirebaseUserData) {
+        firebaseModel.setFirebaseUserDeleterListener(listenerForFirebaseUserData);
     }
 
     public void setSignedInUserInFirebase(User user) {
@@ -74,8 +75,11 @@ public class Model {
         firebaseModel.fetchAllPostsData();
     }
 
-    public void savePostsInFirebase() {
-        // TODO complete the logic of saving the posts from the Model.
-//        firebaseModel.savePosts
+    public void setListenerForFirebaseDataManager(FirebaseModel.FirebaseDataManagerListener listenerForFirebaseDataManager) {
+        firebaseModel.setFirebaseDataManagerListener(listenerForFirebaseDataManager);
+    }
+
+    public void addPostToFirebase(Post post) {
+        firebaseModel.createNewPost(post);
     }
 }

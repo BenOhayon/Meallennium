@@ -2,18 +2,21 @@ package com.example.ben.meallennium.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
 import android.widget.Button;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.example.ben.meallennium.R;
+import com.example.ben.meallennium.model.entities.Post;
 
 public class AddNewPostFragment extends Fragment {
 
     public interface AddNewPostFragmentListener {
-        void onPost();
+        void onPost(Post post);
         void onCancel();
     }
 
@@ -29,9 +32,14 @@ public class AddNewPostFragment extends Fragment {
 
         Button postButton = view.findViewById(R.id.createPostScreen__postButton);
         Button cancelButton = view.findViewById(R.id.createPostScreen__cancelButton);
+        EditText postNameEt = view.findViewById(R.id.createPostScreen__postNameEt);
+        TextInputEditText postDescEt = view.findViewById(R.id.createPostScreen__postDescTextArea);
 
         postButton.setOnClickListener((View v) -> {
-            listener.onPost();
+            String name = postNameEt.getText().toString();
+            String desc = postDescEt.getText().toString();
+            Post newPost = new Post(name, desc);
+            listener.onPost(newPost);
         });
 
         cancelButton.setOnClickListener((View v) -> {
