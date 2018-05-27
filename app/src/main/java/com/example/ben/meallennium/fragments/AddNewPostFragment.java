@@ -9,9 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.model.entities.Post;
+import com.example.ben.meallennium.utils.ProgressBarManager;
 
 public class AddNewPostFragment extends Fragment {
 
@@ -34,8 +36,11 @@ public class AddNewPostFragment extends Fragment {
         Button cancelButton = view.findViewById(R.id.createPostScreen__cancelButton);
         EditText postNameEt = view.findViewById(R.id.createPostScreen__postNameEt);
         TextInputEditText postDescEt = view.findViewById(R.id.createPostScreen__postDescTextArea);
+        ProgressBar loadingProgressBar = view.findViewById(R.id.createPostScreen__progressBar);
+        ProgressBarManager.bindProgressBar(loadingProgressBar);
 
         postButton.setOnClickListener((View v) -> {
+            ProgressBarManager.showProgressBar();
             String name = postNameEt.getText().toString();
             String desc = postDescEt.getText().toString();
             Post newPost = new Post(name, desc);

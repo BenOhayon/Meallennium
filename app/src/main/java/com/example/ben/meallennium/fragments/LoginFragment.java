@@ -8,12 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.model.entities.Dinner;
 import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.utils.FieldVerifier;
 import com.example.ben.meallennium.utils.LoginControllerListener;
+import com.example.ben.meallennium.utils.ProgressBarManager;
 
 public class LoginFragment extends Fragment {
 
@@ -32,7 +34,12 @@ public class LoginFragment extends Fragment {
         EditText emailEt = view.findViewById(R.id.loginScreen__emailEt);
         EditText passwordEt = view.findViewById(R.id.loginScreen__passwordEt);
 
+        ProgressBar loadingProgressBar = view.findViewById(R.id.loginScreen__progressBar);
+        ProgressBarManager.bindProgressBar(loadingProgressBar);
+
         loginButton.setOnClickListener((View v) -> {
+            ProgressBarManager.showProgressBar();
+
             String email = emailEt.getText().toString();
             String password = passwordEt.getText().toString();
 

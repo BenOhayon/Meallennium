@@ -3,6 +3,7 @@ package com.example.ben.meallennium.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ProgressBar;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.fragments.DinnerRegistrationFragment;
@@ -15,6 +16,7 @@ import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.utils.FragmentTransactions;
 import com.example.ben.meallennium.utils.LoginControllerListener;
+import com.example.ben.meallennium.utils.ProgressBarManager;
 import com.example.ben.meallennium.utils.RegisterControllerListener;
 import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
@@ -23,7 +25,6 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
         RegistrationFragment.RegisterFragmentListener,
         RegisterControllerListener,
         LoginControllerListener, FirebaseModel.FirebaseUserAuthListener {
-
 
     // --------------------
     //   CALLBACK METHODS
@@ -50,9 +51,9 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
         }
     }
 
-    // --------------------
-    //   LISTENER METHODS
-    // --------------------
+    // -------------------------------------
+    //   LISTENER METHODS FOR BUTTON CLICKS
+    // -------------------------------------
 
     @Override
     public void onRegisterOptionSelect() {
@@ -93,32 +94,41 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
         getSupportFragmentManager().popBackStack();
     }
 
+    // ----------------------------------
+    //   LISTENER METHODS FOR OPERATIONS
+    // ----------------------------------
+
     @Override
     public void onCreateUserSuccess(User user) {
         Model.instance.setSignedInUserInFirebase(user);
+        ProgressBarManager.dismissProgressBar();
         ToastMessageDisplayer.displayToast(this, "The user " + user + " signed up!");
         moveToPostListActivity();
     }
 
     @Override
     public void onCreateUserFailure(User user) {
+        ProgressBarManager.dismissProgressBar();
         ToastMessageDisplayer.displayToast(this, "Failed to sign up user");
     }
 
     @Override
     public void onSignInUserSuccess(User user) {
         Model.instance.setSignedInUserInFirebase(user);
+        ProgressBarManager.dismissProgressBar();
         ToastMessageDisplayer.displayToast(this, "A user has signed in!");
         moveToPostListActivity();
     }
 
     @Override
     public void onSignInUserFailure(User user) {
+        ProgressBarManager.dismissProgressBar();
         ToastMessageDisplayer.displayToast(this, "Failed to sign in user");
     }
 
     @Override
     public void onError() {
+        ProgressBarManager.dismissProgressBar();
         ToastMessageDisplayer.displayToast(this, "Invalid fields");
     }
 

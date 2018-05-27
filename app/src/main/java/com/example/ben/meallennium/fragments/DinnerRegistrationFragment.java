@@ -9,10 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.model.entities.Dinner;
 import com.example.ben.meallennium.utils.FieldVerifier;
+import com.example.ben.meallennium.utils.ProgressBarManager;
 import com.example.ben.meallennium.utils.RegisterControllerListener;
 import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
@@ -33,8 +35,13 @@ public class DinnerRegistrationFragment extends Fragment {
         EditText passwordEt = view.findViewById(R.id.dinnerRegisterScreen__passwordEt);
         EditText verifyPasswordEt = view.findViewById(R.id.dinnerRegisterScreen__verifyPasswordEt);
 
+        ProgressBar loadingProgressBar = view.findViewById(R.id.dinnerRegisterScreen__progressBar);
+        ProgressBarManager.bindProgressBar(loadingProgressBar);
+
         registerButton.setOnClickListener((View v) -> {
             if(listener != null) {
+                ProgressBarManager.showProgressBar();
+
                 String email = emailEt.getText().toString();
                 String pass = passwordEt.getText().toString();
                 String verifiedPass = verifyPasswordEt.getText().toString();
