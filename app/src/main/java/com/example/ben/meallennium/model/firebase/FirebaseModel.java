@@ -5,7 +5,10 @@ import android.util.Log;
 
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
+import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -22,16 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FirebaseModel {
-
-    public void createNewPost(Post post) {
-        DatabaseReference postsRef = dbRef.child("Posts").child(post.getId());
-        postsRef.setValue(post, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                firebaseDataManagerListener.onCreateNewPost(post);
-            }
-        });
-    }
 
     public interface FirebaseUserAuthListener {
         void onCreateUserSuccess(User user);
@@ -153,6 +146,24 @@ public class FirebaseModel {
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
+    }
+
+    public void createNewPost(Post post) {
+        Log.d("buildTest", "creating a new post in FirebaseModel.");
+        DatabaseReference postsRef = dbRef.child("Posts").child(post.getId());
+        postsRef.setValue(post).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d("buildTest", "Create new post success!");
+                firebaseDataManagerListener.onCreateNewPost(post);
+            }
+        })
+        .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("buildTest", "Creating a new post in Firebase failed.");
             }
         });
     }

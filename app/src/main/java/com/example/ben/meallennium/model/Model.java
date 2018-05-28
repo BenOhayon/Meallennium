@@ -82,4 +82,8 @@ public class Model {
     public void addPostToFirebase(Post post) {
         firebaseModel.createNewPost(post);
     }
+
+    public List<Post> getPostsData() {
+        return postsData;
+    }
 }

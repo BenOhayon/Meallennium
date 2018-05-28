@@ -10,10 +10,8 @@ import android.view.MenuItem;
 import android.widget.SearchView;
 
 import com.example.ben.meallennium.R;
-import com.example.ben.meallennium.adapters.PostsListAdapter;
 import com.example.ben.meallennium.dialogs.DeleteAccountConfirmationDialog;
 import com.example.ben.meallennium.dialogs.LogoutConfirmationDialog;
-import com.example.ben.meallennium.fragments.AboutFragment;
 import com.example.ben.meallennium.fragments.AddNewPostFragment;
 import com.example.ben.meallennium.fragments.PostsListFragment;
 import com.example.ben.meallennium.model.Model;
@@ -21,14 +19,14 @@ import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.utils.FragmentTransactions;
+import com.example.ben.meallennium.utils.Requests;
+import com.example.ben.meallennium.utils.Results;
 import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
 public class PostsListActivity extends AppCompatActivity implements
         PostsListFragment.PostsListFragmentListener,
         AddNewPostFragment.AddNewPostFragmentListener,
-        AboutFragment.AboutFragmentListener, FirebaseModel.FirebaseUserDeleterListener {
-
-    private PostsListAdapter adapter;
+        FirebaseModel.FirebaseUserDeleterListener {
 
     // --------------------
     //   CALLBACK METHODS
@@ -65,7 +63,7 @@ public class PostsListActivity extends AppCompatActivity implements
 
             case R.id.actionMenu__add:
                 Intent toCreatePostScreen = new Intent(this, AddNewPostActivity.class);
-                startActivity(toCreatePostScreen);
+                startActivityForResult(toCreatePostScreen, Requests.NEW_POST_REQUEST);
                 break;
 
             case R.id.actionMenu__deleteAccount:
@@ -77,13 +75,26 @@ public class PostsListActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == Requests.NEW_POST_REQUEST) {
+            if(resultCode == Results.POST_CREATION_SUCCESS) {
+                String postName = data.getStringExtra("postName");
+                String postDesc = data.getStringExtra("postDesc");
+                Model.instance.addPostToFirebase(new Post(postName, postDesc));
+            }
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_posts_list, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.actionMenu__search).getActionView();
         searchView.setQueryHint("Type a dish or restaurant");
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        if(searchManager != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        }
 
         return true;
     }
@@ -94,7 +105,7 @@ public class PostsListActivity extends AppCompatActivity implements
 
     @Override
     public void onListItemSelect(int clickedItemIndex) {
-        Model.instance.popUpAllUsers();
+        //Model.instance.popUpAllUsers();
     }
 
     @Override
@@ -105,11 +116,6 @@ public class PostsListActivity extends AppCompatActivity implements
 
     @Override
     public void onCancel() {
-        getSupportFragmentManager().popBackStack();
-    }
-
-    @Override
-    public void onOKPressed() {
         getSupportFragmentManager().popBackStack();
     }
 
@@ -127,18 +133,15 @@ public class PostsListActivity extends AppCompatActivity implements
     /**
      * Handles the action search intent that starts this activity whenever we wish
      * to perform a search task in the activity.
+     *
      * @param intent The intent to handle.
      */
     private void handleIntent(Intent intent) {
 
-        if(Intent.ACTION_SEARCH.equals(intent.getAction())) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             // TODO enter the search logic here.
-
+            ToastMessageDisplayer.displayToast(this, query);
         }
-    }
-
-    public void setAdapter(PostsListAdapter adapter) {
-        this.adapter = adapter;
     }
 }
