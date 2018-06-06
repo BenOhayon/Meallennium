@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,9 +48,13 @@ public class PostsListFragment extends Fragment implements
 
         ProgressBar loadingProgressBar = view.findViewById(R.id.postsListScreen__progressBar);
         ProgressBarManager.bindProgressBar(loadingProgressBar);
-
-        Model.instance.fetchAllPostsDataFromFirebase();
         ProgressBarManager.showProgressBar();
+
+        // TODO Solve the bug of displaying 2 copies of a created post.
+        if(savedInstanceState == null) {
+            Log.d("buildTest", "savedInstanceState is null!");
+            Model.instance.fetchAllPostsDataFromFirebase();
+        }
 
         RecyclerView postsList = view.findViewById(R.id.postsListScreen__list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -87,16 +92,21 @@ public class PostsListFragment extends Fragment implements
     @Override
     public void onFetchAllPosts(List<Post> posts) {
         Model.instance.setPostsData(posts);
+//        adapter.setPostsToDisplay(Model.instance.getPostsData());
         adapter.notifyDataSetChanged();
+
+        Bundle args = new Bundle();
+        setArguments(args);
+        Log.d("buildTest", "setArguments(args) was called");
+
         ProgressBarManager.dismissProgressBar();
     }
 
     @Override
     public void onCreateNewPost(Post post) {
         Model.instance.getPostsData().add(post);
+//        adapter.setPostsToDisplay(Model.instance.getPostsData());
         adapter.notifyDataSetChanged();
         ProgressBarManager.dismissProgressBar();
-
-        // TODO Fix the bug in refreshing the list by the adapter.
     }
 }

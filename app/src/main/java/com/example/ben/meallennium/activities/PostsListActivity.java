@@ -12,7 +12,6 @@ import android.widget.SearchView;
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.dialogs.DeleteAccountConfirmationDialog;
 import com.example.ben.meallennium.dialogs.LogoutConfirmationDialog;
-import com.example.ben.meallennium.fragments.AddNewPostFragment;
 import com.example.ben.meallennium.fragments.PostsListFragment;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
@@ -23,9 +22,11 @@ import com.example.ben.meallennium.utils.Requests;
 import com.example.ben.meallennium.utils.Results;
 import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class PostsListActivity extends AppCompatActivity implements
         PostsListFragment.PostsListFragmentListener,
-        AddNewPostFragment.AddNewPostFragmentListener,
         FirebaseModel.FirebaseUserDeleterListener {
 
     // --------------------
@@ -105,18 +106,7 @@ public class PostsListActivity extends AppCompatActivity implements
 
     @Override
     public void onListItemSelect(int clickedItemIndex) {
-        //Model.instance.popUpAllUsers();
-    }
 
-    @Override
-    public void onPost(Post post) {
-        Model.instance.addPostToFirebase(post);
-        getSupportFragmentManager().popBackStack();
-    }
-
-    @Override
-    public void onCancel() {
-        getSupportFragmentManager().popBackStack();
     }
 
     @Override
@@ -141,7 +131,15 @@ public class PostsListActivity extends AppCompatActivity implements
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             // TODO enter the search logic here.
-            ToastMessageDisplayer.displayToast(this, query);
+
+            List<Post> postsToFilter = new LinkedList<>();
+            for(Post post : Model.instance.getPostsData()) {
+                if(post.getName().contains(query)) {
+                    postsToFilter.add(post);
+                }
+            }
+
+            // TODO Find a solution for refreshing the RecyclerView adapter in PostsListFragment from here.
         }
     }
 }
