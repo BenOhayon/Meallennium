@@ -1,17 +1,32 @@
 package com.example.ben.meallennium.model.entities;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
 import java.util.Random;
 
+@Entity
 public class Post {
 
     private static final int ID_LENGTH = 12;
 
+    @PrimaryKey
+    @NonNull
     private String id;
+
+    @ColumnInfo(name = "Name")
+    @NonNull
     private String name;
+
+    @ColumnInfo(name = "Description")
     private String description;
 
     public Post() {}
 
+    @Ignore
     public Post(String name, String description) {
         this.id = generatePostId();
         this.name = name;
@@ -40,5 +55,17 @@ public class Post {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setId(@NonNull String id) {
+        this.id = id;
+    }
+
+    public void setName(@NonNull String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

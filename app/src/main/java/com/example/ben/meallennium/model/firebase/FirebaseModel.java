@@ -26,77 +26,69 @@ import java.util.List;
 
 public class FirebaseModel {
 
-    public interface FirebaseUserAuthListener {
-        void onCreateUserSuccess(User user);
-        void onCreateUserFailure(User user);
-        void onSignInUserSuccess(User user);
-        void onSignInUserFailure(User user);
+    public interface OnUserDeleteListener {
+        void onDeletionComplete(User user);
     }
 
-    public interface FirebaseUserDeleterListener {
-        void onDeleteUser(User user);
+    public interface OnCreateNewUserListener {
+        void onCreationComplete(User user);
     }
 
-    public interface FirebaseDataManagerListener {
-        void onFetchAllPosts(List<Post> posts);
-        void onCreateNewPost(Post post);
+    public interface OnSignInUserListener {
+        void onSignInComplete(User user);
     }
 
-    private FirebaseUserAuthListener firebaseUserAuthListener;
-    private FirebaseUserDeleterListener firebaseUserDeleterListener;
-    private FirebaseDataManagerListener firebaseDataManagerListener;
+    public interface OnCreateNewPostListener {
+        void onComplete(Post post);
+    }
+
+    public interface OnFetchAllPostsListener {
+        void onComplete(List<Post> posts);
+    }
+
     private FirebaseAuth auth;
     private DatabaseReference dbRef;
     private User signedInUser;
+
+    private ValueEventListener valueEventListener;
 
     public FirebaseModel() {
         auth = FirebaseAuth.getInstance();
         dbRef = FirebaseDatabase.getInstance().getReference();
     }
 
-    public void setFirebaseUserAuthListener(FirebaseUserAuthListener firebaseUserAuthListener) {
-        this.firebaseUserAuthListener = firebaseUserAuthListener;
-    }
-
-    public void setFirebaseUserDeleterListener(FirebaseUserDeleterListener firebaseUserDeleterListener) {
-        this.firebaseUserDeleterListener = firebaseUserDeleterListener;
-    }
-
-    public void setFirebaseDataManagerListener(FirebaseDataManagerListener firebaseDataManagerListener) {
-        this.firebaseDataManagerListener = firebaseDataManagerListener;
-    }
-
     public void setSignedInUser(User user) {
         signedInUser = user;
     }
 
-    public void createNewUser(User user) {
+    public void registerNewUser(User user, final OnCreateNewUserListener listener) {
         auth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
                 .addOnCompleteListener((Task<AuthResult> task) -> {
                     if(task.isSuccessful()) {
                         Log.d("buildTest", "Firebase registration successful!");
-                        firebaseUserAuthListener.onCreateUserSuccess(user);
+                        listener.onCreationComplete(user);
                     } else {
                         Log.d("buildTest", "Firebase registration failed: " + task.getException());
-                        firebaseUserAuthListener.onCreateUserFailure(user);
+                        listener.onCreationComplete(null);
                     }
                 });
     }
 
-    public void signInUser(User user) {
+    public void signInUser(User user, final OnSignInUserListener listener) {
         auth.signInWithEmailAndPassword(user.getEmail(), user.getPassword())
                 .addOnCompleteListener((Task<AuthResult> task) -> {
                     if(task.isSuccessful()) {
                         Log.d("buildTest", "Firebase sign in successful!");
-                        firebaseUserAuthListener.onSignInUserSuccess(user);
+                        listener.onSignInComplete(user);
+                        signedInUser = user;
                     } else {
                         Log.d("buildTest", "Firebase sign in failed: " + task.getException());
-                        firebaseUserAuthListener.onSignInUserFailure(user);
+                        listener.onSignInComplete(null);
                     }
                 });
     }
 
-    public void deleteSignedInUser() {
+    public void deleteSignedInUser(final OnUserDeleteListener listener) {
         FirebaseUser user = auth.getCurrentUser();
         AuthCredential credential = EmailAuthProvider.getCredential(signedInUser.getEmail(), signedInUser.getPassword());
 
@@ -113,7 +105,8 @@ public class FirebaseModel {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
                         Log.d("buildTest", "User account deleted.");
-                        firebaseUserDeleterListener.onDeleteUser(signedInUser);
+                        listener.onDeletionComplete(signedInUser);
+                        signedInUser = null;
                     }
                 }
             });
@@ -129,9 +122,9 @@ public class FirebaseModel {
         auth.signOut();
     }
 
-    public void fetchAllPostsData() {
+    public void fetchAllPostsData(final OnFetchAllPostsListener listener) {
         DatabaseReference postsRef = dbRef.child("Posts");
-        postsRef.addValueEventListener(new ValueEventListener() {
+        valueEventListener = postsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Post> posts = new LinkedList<>();
@@ -140,30 +133,38 @@ public class FirebaseModel {
                     posts.add(post);
                 }
 
-                firebaseDataManagerListener.onFetchAllPosts(posts);
+                Log.d("buildTest", "onDataChange() called on firebase");
+                listener.onComplete(posts);
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("buildTest", "onCancelled() called in firebase");
+                listener.onComplete(null);
             }
         });
     }
 
-    public void createNewPost(Post post) {
+    public void cancelFetchingData() {
+        DatabaseReference ref = dbRef.child("Posts");
+        ref.removeEventListener(valueEventListener);
+    }
+
+    public void createNewPost(Post post, final OnCreateNewPostListener listener) {
         Log.d("buildTest", "creating a new post in FirebaseModel.");
         DatabaseReference postsRef = dbRef.child("Posts").child(post.getId());
         postsRef.setValue(post).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.d("buildTest", "Create new post success!");
-                firebaseDataManagerListener.onCreateNewPost(post);
+                listener.onComplete(post);
             }
         })
         .addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d("buildTest", "Creating a new post in Firebase failed.");
+                listener.onComplete(null);
             }
         });
     }

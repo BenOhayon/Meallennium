@@ -1,7 +1,10 @@
 package com.example.ben.meallennium.fragments;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,20 +20,20 @@ import com.example.ben.meallennium.adapters.PostsListAdapter;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
+import com.example.ben.meallennium.model.viewmodels.PostsListViewModel;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 
 import java.util.List;
 
 public class PostsListFragment extends Fragment implements
-        PostsListAdapter.ListItemClickListener,
-        FirebaseModel.FirebaseDataManagerListener {
-
-    private PostsListAdapter adapter;
+        PostsListAdapter.ListItemClickListener{
 
     public interface PostsListFragmentListener {
         void onListItemSelect(int clickedItemIndex);
     }
 
+    private PostsListViewModel postsViewModel;
+    private PostsListAdapter adapter;
     private PostsListFragmentListener listener;
 
     public PostsListFragment() {}
@@ -38,7 +41,6 @@ public class PostsListFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Model.instance.setListenerForFirebaseDataManager(this);
     }
 
     @Override
@@ -49,12 +51,6 @@ public class PostsListFragment extends Fragment implements
         ProgressBar loadingProgressBar = view.findViewById(R.id.postsListScreen__progressBar);
         ProgressBarManager.bindProgressBar(loadingProgressBar);
         ProgressBarManager.showProgressBar();
-
-        // TODO Solve the bug of displaying 2 copies of a created post.
-        if(savedInstanceState == null) {
-            Log.d("buildTest", "savedInstanceState is null!");
-            Model.instance.fetchAllPostsDataFromFirebase();
-        }
 
         RecyclerView postsList = view.findViewById(R.id.postsListScreen__list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -76,6 +72,15 @@ public class PostsListFragment extends Fragment implements
             throw new RuntimeException(context.toString()
                     + " must implement PostsListFragmentListener");
         }
+
+        postsViewModel = ViewModelProviders.of(this).get(PostsListViewModel.class);
+        postsViewModel.getPostsData().observe(this, new Observer<List<Post>>() {
+            @Override
+            public void onChanged(@Nullable List<Post> posts) {
+                adapter.notifyDataSetChanged();
+                Log.d("buildTest", "LiveData has updated");
+            }
+        });
     }
 
     @Override
@@ -89,24 +94,17 @@ public class PostsListFragment extends Fragment implements
         listener.onListItemSelect(clickedItemIndex);
     }
 
-    @Override
-    public void onFetchAllPosts(List<Post> posts) {
-        Model.instance.setPostsData(posts);
-//        adapter.setPostsToDisplay(Model.instance.getPostsData());
-        adapter.notifyDataSetChanged();
+//    @Override
+//    public void onFetchAllPosts(List<Post> posts) {
+//        Model.instance.setPostsData(posts);
+//        adapter.notifyDataSetChanged();
+//        ProgressBarManager.dismissProgressBar();
+//    }
 
-        Bundle args = new Bundle();
-        setArguments(args);
-        Log.d("buildTest", "setArguments(args) was called");
-
-        ProgressBarManager.dismissProgressBar();
-    }
-
-    @Override
-    public void onCreateNewPost(Post post) {
-        Model.instance.getPostsData().add(post);
-//        adapter.setPostsToDisplay(Model.instance.getPostsData());
-        adapter.notifyDataSetChanged();
-        ProgressBarManager.dismissProgressBar();
-    }
+//    @Override
+//    public void onCreateNewPost(Post post) {
+//        Model.instance.getPostsData().add(post);
+//        adapter.notifyDataSetChanged();
+//        ProgressBarManager.dismissProgressBar();
+//    }
 }

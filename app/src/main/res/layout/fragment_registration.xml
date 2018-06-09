@@ -4,56 +4,135 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.RegistrationFragment"
-    tools:layout_editor_absoluteY="25dp">
-
+    tools:context=".fragments.RegistrationFragment">
 
     <TextView
-        android:id="@+id/loginScreen__title"
+        android:id="@+id/registerScreen__title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="22dp"
         android:fontFamily="cursive"
         android:text="Registration"
         android:textAlignment="center"
         android:textColor="@android:color/black"
-        android:textSize="34sp"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="20dp"
+        android:text="Verify Password:"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView8" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="20dp"
+        android:text="Password:"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="90dp"
+        android:text="Email:"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registerScreen__title" />
+
+    <EditText
+        android:id="@+id/registerScreen__emailEt"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="36dp"
+        android:ems="10"
+        android:inputType="textEmailAddress"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textView7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/textView7" />
+
+    <EditText
+        android:id="@+id/registerScreen__passwordEt"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:ems="10"
+        android:inputType="textPersonName|textPassword"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textView8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView8" />
+
+    <EditText
+        android:id="@+id/registerScreen__verifyPasswordEt"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:ems="10"
+        android:inputType="textPersonName|textPassword"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textView6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView6" />
+
     <LinearLayout
-        android:layout_width="298dp"
-        android:layout_height="322dp"
-        android:layout_marginBottom="16dp"
-        android:layout_marginTop="16dp"
-        android:orientation="vertical"
+        android:id="@+id/linearLayout3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="50dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginScreen__title">
+        app:layout_constraintTop_toBottomOf="@+id/registerScreen__verifyPasswordEt">
 
         <Button
-            android:id="@+id/registrationScreen__restaurantRegister"
-            android:layout_width="match_parent"
+            android:id="@+id/registerScreen__registerButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Restaurant"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:text="Register" />
 
         <Button
-            android:id="@+id/registrationScreen__dinnerRegister"
-            android:layout_width="match_parent"
+            android:id="@+id/registerScreen__cancelButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Dinner"
-            android:layout_weight="1"/>
-
-        <Button
-            android:id="@+id/registrationScreen__backButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Back"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:text="Cancel" />
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/dinnerRegisterScreen__progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registerScreen__verifyPasswordEt" />
 
 </android.support.constraint.ConstraintLayout>

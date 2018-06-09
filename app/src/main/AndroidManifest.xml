@@ -56,6 +56,16 @@
             android:theme="@style/Theme.AppCompat.Light">
 
         </activity>
+        <activity
+            android:name=".activities.PostDetailsActivity"
+            android:label="Display Post"
+            android:theme="@style/Theme.AppCompat.Light">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.PostsListActivity" />
+
+        </activity>
     </application>
 
 </manifest>

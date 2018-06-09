@@ -3,13 +3,11 @@ package com.example.ben.meallennium.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.ProgressBar;
+import android.util.Log;
 
 import com.example.ben.meallennium.R;
-import com.example.ben.meallennium.fragments.DinnerRegistrationFragment;
 import com.example.ben.meallennium.fragments.LoginFragment;
 import com.example.ben.meallennium.fragments.RegistrationFragment;
-import com.example.ben.meallennium.fragments.RestaurantRegistrationFragment;
 import com.example.ben.meallennium.fragments.WelcomeScreenFragment;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.User;
@@ -22,9 +20,8 @@ import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
 public class WelcomeScreenActivity extends AppCompatActivity implements
         WelcomeScreenFragment.WelcomeScreenFragmentListener,
-        RegistrationFragment.RegisterFragmentListener,
         RegisterControllerListener,
-        LoginControllerListener, FirebaseModel.FirebaseUserAuthListener {
+        LoginControllerListener {
 
     // --------------------
     //   CALLBACK METHODS
@@ -35,25 +32,18 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome_screen);
 
-        Model.instance.setListenerForFirebaseModel(this);
-//        Model.instance.savePostsInFirebase();
-
-        WelcomeScreenFragment welcomeScreenFragment = new WelcomeScreenFragment();
-        FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_welcome_screen_container, welcomeScreenFragment, false);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
+        Log.d("buildTest", "Moving to post list activity");
         if(Model.instance.isSignedInUserInFirebase()) {
             moveToPostListActivity();
+        } else {
+            WelcomeScreenFragment welcomeScreenFragment = new WelcomeScreenFragment();
+            FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_welcome_screen_container, welcomeScreenFragment, false);
         }
     }
 
-    // -------------------------------------
-    //   LISTENER METHODS FOR BUTTON CLICKS
-    // -------------------------------------
+    // --------------------
+    //   LISTENER METHODS
+    // --------------------
 
     @Override
     public void onRegisterOptionSelect() {
@@ -68,25 +58,39 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onRestaurantRegisterOptionSelect() {
-        RestaurantRegistrationFragment restaurantRegistrationFragment = new RestaurantRegistrationFragment();
-        FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_welcome_screen_container, restaurantRegistrationFragment, true);
-    }
-
-    @Override
-    public void onDinnerRegisterOptionSelect() {
-        DinnerRegistrationFragment dinnerRegistrationFragment = new DinnerRegistrationFragment();
-        FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_welcome_screen_container, dinnerRegistrationFragment, true);
-    }
-
-    @Override
     public void onRegister(User user) {
-        Model.instance.addUserToFirebase(user);
+        Model.instance.addUserToFirebase(user, new FirebaseModel.OnCreateNewUserListener() {
+            @Override
+            public void onCreationComplete(User user) {
+                if(user != null) {
+                    Model.instance.setSignedInUserInFirebase(user);
+                    ProgressBarManager.dismissProgressBar();
+                    ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, "The user " + user + " signed up!");
+                    moveToPostListActivity();
+                } else {
+                    ProgressBarManager.dismissProgressBar();
+                    ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, "Failed to sign up user");
+                }
+            }
+        });
     }
 
     @Override
     public void onLogin(User user) {
-        Model.instance.signInUserToFirebase(user);
+        Model.instance.signInUserToFirebase(user, new FirebaseModel.OnSignInUserListener() {
+            @Override
+            public void onSignInComplete(User user) {
+                if(user != null) {
+                    Model.instance.setSignedInUserInFirebase(user);
+                    ProgressBarManager.dismissProgressBar();
+                    ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, "A user has signed in!");
+                    moveToPostListActivity();
+                } else {
+                    ProgressBarManager.dismissProgressBar();
+                    ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, "Failed to sign in user");
+                }
+            }
+        });
     }
 
     @Override
@@ -94,42 +98,10 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
         getSupportFragmentManager().popBackStack();
     }
 
-    // ----------------------------------
-    //   LISTENER METHODS FOR OPERATIONS
-    // ----------------------------------
-
     @Override
-    public void onCreateUserSuccess(User user) {
-        Model.instance.setSignedInUserInFirebase(user);
+    public void onError(String error) {
         ProgressBarManager.dismissProgressBar();
-        ToastMessageDisplayer.displayToast(this, "The user " + user + " signed up!");
-        moveToPostListActivity();
-    }
-
-    @Override
-    public void onCreateUserFailure(User user) {
-        ProgressBarManager.dismissProgressBar();
-        ToastMessageDisplayer.displayToast(this, "Failed to sign up user");
-    }
-
-    @Override
-    public void onSignInUserSuccess(User user) {
-        Model.instance.setSignedInUserInFirebase(user);
-        ProgressBarManager.dismissProgressBar();
-        ToastMessageDisplayer.displayToast(this, "A user has signed in!");
-        moveToPostListActivity();
-    }
-
-    @Override
-    public void onSignInUserFailure(User user) {
-        ProgressBarManager.dismissProgressBar();
-        ToastMessageDisplayer.displayToast(this, "Failed to sign in user");
-    }
-
-    @Override
-    public void onError() {
-        ProgressBarManager.dismissProgressBar();
-        ToastMessageDisplayer.displayToast(this, "Invalid fields");
+        ToastMessageDisplayer.displayToast(this, error);
     }
 
 

@@ -11,7 +11,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.example.ben.meallennium.R;
-import com.example.ben.meallennium.model.entities.Dinner;
 import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.utils.FieldVerifier;
 import com.example.ben.meallennium.utils.LoginControllerListener;
@@ -43,9 +42,11 @@ public class LoginFragment extends Fragment {
             String email = emailEt.getText().toString();
             String password = passwordEt.getText().toString();
 
-            if(FieldVerifier.areVerifiedFields(email, password, null)) {
+            if(FieldVerifier.verifyLogin(email, password)) {
                 User user = new User(email, password);
                 listener.onLogin(user);
+            } else {
+                listener.onError("Failed to login user");
             }
 
             emailEt.setText("");

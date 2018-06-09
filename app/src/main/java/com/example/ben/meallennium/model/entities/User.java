@@ -9,11 +9,13 @@ public class User {
     private String id;
     private String password;
     private String email;
+    private String username;
 
     public User(String email, String password) {
         this.id = generateUserId();
         this.email = email;
         this.password = password;
+        this.username = extractUsernameFromEmail();
     }
 
     private String generateUserId() {
@@ -26,6 +28,24 @@ public class User {
         }
 
         return sb.toString();
+    }
+
+    private String extractUsernameFromEmail() {
+        StringBuilder sb = new StringBuilder();
+
+        int i = 0;
+        String email = getEmail();
+
+        while(i < email.length() && email.charAt(i) != '@') {
+            sb.append(email.charAt(i));
+            i++;
+        }
+
+        return sb.toString();
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public String getId() {

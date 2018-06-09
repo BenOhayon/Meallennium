@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
@@ -26,8 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class PostsListActivity extends AppCompatActivity implements
-        PostsListFragment.PostsListFragmentListener,
-        FirebaseModel.FirebaseUserDeleterListener {
+        PostsListFragment.PostsListFragmentListener {
 
     // --------------------
     //   CALLBACK METHODS
@@ -38,7 +38,6 @@ public class PostsListActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posts_list);
 
-        Model.instance.setListenerForFirebaseUserDeleter(this);
         handleIntent(getIntent());
 
         PostsListFragment postsListFragment = new PostsListFragment();
@@ -81,7 +80,12 @@ public class PostsListActivity extends AppCompatActivity implements
             if(resultCode == Results.POST_CREATION_SUCCESS) {
                 String postName = data.getStringExtra("postName");
                 String postDesc = data.getStringExtra("postDesc");
-                Model.instance.addPostToFirebase(new Post(postName, postDesc));
+                Model.instance.addPostToFirebase(new Post(postName, postDesc), new FirebaseModel.OnCreateNewPostListener() {
+                    @Override
+                    public void onComplete(Post post) {
+                        Model.instance.addPostToLocalDB(post, null);
+                    }
+                });
             }
         }
     }
@@ -106,14 +110,12 @@ public class PostsListActivity extends AppCompatActivity implements
 
     @Override
     public void onListItemSelect(int clickedItemIndex) {
+        Post selectedPost = Model.instance.getPostsData().getValue().get(clickedItemIndex);
 
-    }
-
-    @Override
-    public void onDeleteUser(User user) {
-        Model.instance.setSignedInUserInFirebase(null);
-        ToastMessageDisplayer.displayToast(this, "The user was deleted.");
-        finish();
+        Intent toPostDetailsActivity = new Intent(this, PostDetailsActivity.class);
+        toPostDetailsActivity.putExtra("postName", selectedPost.getName());
+        toPostDetailsActivity.putExtra("postDescription", selectedPost.getDescription());
+        startActivity(toPostDetailsActivity);
     }
 
     // ----------------------------
@@ -133,13 +135,12 @@ public class PostsListActivity extends AppCompatActivity implements
             // TODO enter the search logic here.
 
             List<Post> postsToFilter = new LinkedList<>();
-            for(Post post : Model.instance.getPostsData()) {
+            for(Post post : Model.instance.getPostsData().getValue()) {
                 if(post.getName().contains(query)) {
                     postsToFilter.add(post);
+                    Log.d("buildTest", "Post name: " + post.getName() + ", Post Description: " + post.getDescription());
                 }
             }
-
-            // TODO Find a solution for refreshing the RecyclerView adapter in PostsListFragment from here.
         }
     }
 }

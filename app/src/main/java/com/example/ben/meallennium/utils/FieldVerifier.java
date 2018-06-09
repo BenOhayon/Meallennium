@@ -2,14 +2,21 @@ package com.example.ben.meallennium.utils;
 
 public class FieldVerifier {
 
-    public static boolean areVerifiedFields(String email, String password, String verifiedPass) {
+    public static boolean verifyLogin(String email, String password) {
+        return areVerifiedFields(email, password);
+    }
+
+    public static boolean verifyRegistration(String email, String password, String verifiedPass) {
+        return areVerifiedFields(email, password, verifiedPass);
+    }
+
+    private static boolean areVerifiedFields(String email, String password, String verifiedPass) {
         boolean basicVerification = areVerifiedFields(email, password);
 
-        if(verifiedPass == null || verifiedPass.equals("")) {
-            return basicVerification;
-        }
-
-        return basicVerification && password.equals(verifiedPass);
+        return basicVerification
+                && verifiedPass != null
+                && !verifiedPass.equals("")
+                && password.equals(verifiedPass);
     }
 
     private static boolean areVerifiedFields(String email, String password) {

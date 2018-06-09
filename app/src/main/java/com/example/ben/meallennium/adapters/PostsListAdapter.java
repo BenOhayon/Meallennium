@@ -50,7 +50,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
 
     @Override
     public int getItemCount() {
-        return Model.instance.getPostsData().size();
+        return Model.instance.getPostsData().getValue().size();
     }
 
 //    public List<Post> getPostsToDisplay() {
@@ -70,7 +70,7 @@ public class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.Post
         }
 
         private void bind(int listIndex) {
-            postItemName.setText(Model.instance.getPostsData().get(listIndex).getName());
+            postItemName.setText(Model.instance.getPostsData().getValue().get(listIndex).getName());
         }
 
         @Override
