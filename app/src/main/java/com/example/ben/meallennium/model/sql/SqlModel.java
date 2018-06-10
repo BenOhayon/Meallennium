@@ -19,6 +19,10 @@ public class SqlModel {
         PostAsyncDao.addPost(postToAdd, listener);
     }
 
+    public void addPosts(List<Post> postsToAdd, PostAsyncDao.PostAsyncDaoListener<Boolean> listener) {
+        PostAsyncDao.addPosts(postsToAdd, listener);
+    }
+
     public void deletePost(Post postToDelete, PostAsyncDao.PostAsyncDaoListener<Boolean> listener) {
         PostAsyncDao.deletePost(postToDelete, listener);
     }

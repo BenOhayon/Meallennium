@@ -32,8 +32,8 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome_screen);
 
-        Log.d("buildTest", "Moving to post list activity");
         if(Model.instance.isSignedInUserInFirebase()) {
+            Log.d("buildTest", "Moving to post list activity");
             moveToPostListActivity();
         } else {
             WelcomeScreenFragment welcomeScreenFragment = new WelcomeScreenFragment();

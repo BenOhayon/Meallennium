@@ -2,6 +2,9 @@ package com.example.ben.meallennium.model;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.util.Log;
 
 import com.example.ben.meallennium.model.entities.Post;
@@ -11,6 +14,13 @@ import com.example.ben.meallennium.model.sql.SqlModel;
 import com.example.ben.meallennium.model.sql.room_db_wrapper.PostAsyncDao;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,24 +42,28 @@ public class Model {
             super.onActive();
             sqlModel.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
                 @Override
-                public void onComplete(List<Post> result) {
-                    Log.d("buildTest", "Got posts from local DB");
-                    setValue(result);
+                public void onComplete(List<Post> postsFromDB) {
+                    Log.d("buildTest", "Got " + postsFromDB.size() + " posts from local DB");
+                    setValue(postsFromDB);
                     firebaseModel.fetchAllPostsData(new FirebaseModel.OnFetchAllPostsListener() {
                         @Override
-                        public void onComplete(List<Post> posts) {
-                            Log.d("buildTest", "Got posts from Firebase");
-                            setValue(posts);
-                            ProgressBarManager.dismissProgressBar();
-
-                            for(Post p : posts) {
-                                sqlModel.addPost(p, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
-                                    @Override
-                                    public void onComplete(Boolean result) {
-                                        Log.d("buildTest", "Posts saved in local DB");
-                                    }
-                                });
+                        public void onComplete(List<Post> postsFromFirebase) {
+                            Log.d("buildTest", "Got " + postsFromFirebase.size() + " posts from Firebase");
+                            List<Post> temp = new LinkedList<>();
+                            temp.addAll(postsFromDB);
+                            List<Post> deltaPostsList = getDeltaList(postsFromDB, postsFromFirebase);
+                            Log.d("buildTest", "deltaList size: " + deltaPostsList.size());
+                            if (deltaPostsList.size() != 0) {
+                                temp.addAll(deltaPostsList);
+                                setValue(temp);
                             }
+                            sqlModel.addPosts(deltaPostsList, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
+                                @Override
+                                public void onComplete(Boolean result) {
+                                    Log.d("buildTest", "Posts saved in local DB");
+                                    ProgressBarManager.dismissProgressBar();
+                                }
+                            });
                         }
                     });
                 }
@@ -70,6 +84,49 @@ public class Model {
         firebaseModel = new FirebaseModel();
         sqlModel = new SqlModel();
         postsData = new PostsListLiveData();
+    }
+
+    public Bitmap fetchPostImageFromLocalDB(String imageUrl) {
+        Bitmap bitmap = null;
+        try {
+            File dir = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES);
+            File imageFile = new File(dir,imageUrl);
+            InputStream inputStream = new FileInputStream(imageFile);
+            bitmap = BitmapFactory.decodeStream(inputStream);
+            Log.d("tag","got image from cache: " + imageUrl);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
+    public void savePostImageToLocalCache(Bitmap imageBitmap, String imageUrl) {
+        if (imageBitmap == null) return;
+        try {
+            File dir = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES);
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+            File imageFile = new File(dir,imageUrl);
+            imageFile.createNewFile();
+
+            OutputStream out = new FileOutputStream(imageFile);
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.close();
+
+            //addPicureToGallery(imageFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveImage(Bitmap image, final FirebaseModel.OnSaveImageListener listener) {
+        firebaseModel.saveImage(image, listener);
     }
 
     public void addPostToLocalDB(Post post, PostAsyncDao.PostAsyncDaoListener<Boolean> listener) {
@@ -106,5 +163,15 @@ public class Model {
 
     public LiveData<List<Post>> getPostsData() {
         return postsData;
+    }
+
+    private List<Post> getDeltaList(List<Post> source, List<Post> getDeltaFrom) {
+        List<Post> deltaList = new LinkedList<>();
+        for(Post p : getDeltaFrom) {
+            if(!source.contains(p)) {
+                deltaList.add(p);
+            }
+        }
+        return deltaList;
     }
 }

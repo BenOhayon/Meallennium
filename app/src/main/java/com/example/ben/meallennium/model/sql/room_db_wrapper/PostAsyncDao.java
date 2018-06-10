@@ -9,6 +9,28 @@ import java.util.List;
 
 public class PostAsyncDao {
 
+    public static void addPosts(List<Post> posts, PostAsyncDaoListener<Boolean> listener) {
+        class MyAsyncTask extends AsyncTask<List<Post>, String, Boolean> {
+            @Override
+            protected Boolean doInBackground(List<Post>... postList) {
+                PostSql.addPosts(postList[0]);
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean posts) {
+                super.onPostExecute(posts);
+
+                if(listener != null) {
+                    listener.onComplete(posts);
+                }
+            }
+        }
+
+        MyAsyncTask task = new MyAsyncTask();
+        task.execute(posts);
+    }
+
     public interface PostAsyncDaoListener<T> {
         void onComplete(T result);
     }
@@ -35,7 +57,7 @@ public class PostAsyncDao {
         class MyAsyncTask extends AsyncTask<Post, String, Boolean> {
             @Override
             protected Boolean doInBackground(Post... postList) {
-                PostSql.addPosts(postList[0]);
+                PostSql.addPost(postList[0]);
                 return true;
             }
 

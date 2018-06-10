@@ -16,12 +16,11 @@ import com.example.ben.meallennium.dialogs.LogoutConfirmationDialog;
 import com.example.ben.meallennium.fragments.PostsListFragment;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
-import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.utils.FragmentTransactions;
+import com.example.ben.meallennium.utils.ProgressBarManager;
 import com.example.ben.meallennium.utils.Requests;
 import com.example.ben.meallennium.utils.Results;
-import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -78,12 +77,21 @@ public class PostsListActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == Requests.NEW_POST_REQUEST) {
             if(resultCode == Results.POST_CREATION_SUCCESS) {
+                ProgressBarManager.showProgressBar();
                 String postName = data.getStringExtra("postName");
                 String postDesc = data.getStringExtra("postDesc");
-                Model.instance.addPostToFirebase(new Post(postName, postDesc), new FirebaseModel.OnCreateNewPostListener() {
+                String imageUrl = data.getStringExtra("imageURL");
+                Post post = new Post(postName, postDesc);
+
+                if(imageUrl != null) {
+                    post.setImageUrl(imageUrl);
+                }
+
+                Model.instance.addPostToFirebase(post, new FirebaseModel.OnCreateNewPostListener() {
                     @Override
                     public void onComplete(Post post) {
                         Model.instance.addPostToLocalDB(post, null);
+                        ProgressBarManager.dismissProgressBar();
                     }
                 });
             }

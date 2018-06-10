@@ -24,6 +24,9 @@ public class Post {
     @ColumnInfo(name = "Description")
     private String description;
 
+    @ColumnInfo(name = "Image URL")
+    private String imageUrl;
+
     public Post() {}
 
     @Ignore
@@ -67,5 +70,25 @@ public class Post {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Post) {
+            Post post = (Post) obj;
+
+            return this.id.equals(post.id) &&
+                    this.name.equals(post.name) &&
+                    this.description.equals(post.description);
+        } else
+            return false;
     }
 }

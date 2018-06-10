@@ -11,10 +11,14 @@ public class PostSql {
         return MillenniumDatabase.db.postDao().getAllPosts();
     }
 
-    public static void addPosts(Post...list) {
+    public static void addPosts(List<Post> list) {
         for (Post p : list) {
-            MillenniumDatabase.db.postDao().addPosts(p);
+            MillenniumDatabase.db.postDao().addPost(p);
         }
+    }
+
+    public static void addPost(Post post) {
+        MillenniumDatabase.db.postDao().addPost(post);
     }
 
     public static void deletePost(Post postToDelete) {

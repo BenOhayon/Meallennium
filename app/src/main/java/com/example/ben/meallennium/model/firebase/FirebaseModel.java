@@ -1,11 +1,14 @@
 package com.example.ben.meallennium.model.firebase;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.utils.ToastMessageDisplayer;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -20,7 +23,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,6 +54,10 @@ public class FirebaseModel {
         void onComplete(List<Post> posts);
     }
 
+    public interface OnSaveImageListener {
+        void onDone(String url);
+    }
+
     private FirebaseAuth auth;
     private DatabaseReference dbRef;
     private User signedInUser;
@@ -55,6 +67,40 @@ public class FirebaseModel {
     public FirebaseModel() {
         auth = FirebaseAuth.getInstance();
         dbRef = FirebaseDatabase.getInstance().getReference();
+    }
+
+    public void saveImage(Bitmap image, final OnSaveImageListener listener) {
+        Date d = new Date();
+        String name = "image-"+ d.getTime();
+        StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
+                .child("images").child(name);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = imagesRef.putBytes(data);
+        uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if(!task.isSuccessful()){
+                    throw task.getException();
+                }
+
+                return imagesRef.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if(task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    Log.d("buildTest", "Download Uri task success, download Uri: " + downloadUri);
+                    listener.onDone(downloadUri.toString());
+                } else {
+                    Log.d("buildTest", "Download Uri task failed");
+                }
+            }
+        });
     }
 
     public void setSignedInUser(User user) {
