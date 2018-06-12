@@ -45,7 +45,9 @@ public class PostAsyncDao {
             @Override
             protected void onPostExecute(List<Post> posts) {
                 super.onPostExecute(posts);
-                listener.onComplete(posts);
+                if(listener != null) {
+                    listener.onComplete(posts);
+                }
             }
         }
 
@@ -86,7 +88,9 @@ public class PostAsyncDao {
             @Override
             protected void onPostExecute(Boolean posts) {
                 super.onPostExecute(posts);
-                listener.onComplete(posts);
+                if(listener != null) {
+                    listener.onComplete(posts);
+                }
             }
         }
 

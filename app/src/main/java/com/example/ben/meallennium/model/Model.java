@@ -12,6 +12,7 @@ import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.model.sql.SqlModel;
 import com.example.ben.meallennium.model.sql.room_db_wrapper.PostAsyncDao;
+import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 
 import java.io.File;
@@ -26,12 +27,18 @@ import java.util.List;
 
 public class Model {
 
+    public interface OnOperationCompleteListener {
+        void onComplete();
+    }
+
     public static Model instance = new Model();
     private SqlModel sqlModel;
     private FirebaseModel firebaseModel;
     private PostsListLiveData postsData;
 
     class PostsListLiveData extends MutableLiveData<List<Post>> {
+
+        int x = 0;
 
         public PostsListLiveData() {
             setValue(new LinkedList<>());
@@ -43,16 +50,16 @@ public class Model {
             sqlModel.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
                 @Override
                 public void onComplete(List<Post> postsFromDB) {
-                    Log.d("buildTest", "Got " + postsFromDB.size() + " posts from local DB");
+                    Log.d(LogTag.TAG, "Got " + postsFromDB.size() + " posts from local DB");
                     setValue(postsFromDB);
                     firebaseModel.fetchAllPostsData(new FirebaseModel.OnFetchAllPostsListener() {
                         @Override
                         public void onComplete(List<Post> postsFromFirebase) {
-                            Log.d("buildTest", "Got " + postsFromFirebase.size() + " posts from Firebase");
+                            Log.d(LogTag.TAG, "Got " + postsFromFirebase.size() + " posts from Firebase");
                             List<Post> temp = new LinkedList<>();
                             temp.addAll(postsFromDB);
                             List<Post> deltaPostsList = getDeltaList(postsFromDB, postsFromFirebase);
-                            Log.d("buildTest", "deltaList size: " + deltaPostsList.size());
+                            Log.d(LogTag.TAG, "deltaList size: " + deltaPostsList.size());
                             if (deltaPostsList.size() != 0) {
                                 temp.addAll(deltaPostsList);
                                 setValue(temp);
@@ -60,7 +67,7 @@ public class Model {
                             sqlModel.addPosts(deltaPostsList, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
                                 @Override
                                 public void onComplete(Boolean result) {
-                                    Log.d("buildTest", "Posts saved in local DB");
+                                    Log.d(LogTag.TAG, "Posts saved in local DB");
                                     ProgressBarManager.dismissProgressBar();
                                 }
                             });
@@ -79,14 +86,35 @@ public class Model {
 
 
     private Model() {
-        Log.d("buildTest", "Model is created");
+        Log.d(LogTag.TAG, "Model is created");
         postsData = new PostsListLiveData();
         firebaseModel = new FirebaseModel();
         sqlModel = new SqlModel();
         postsData = new PostsListLiveData();
     }
 
-    public Bitmap fetchPostImageFromLocalDB(String imageUrl) {
+    public void deletePost(Post post, final OnOperationCompleteListener listener) {
+        sqlModel.deletePost(post, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
+            @Override
+            public void onComplete(Boolean result) {
+                firebaseModel.deletePost(post, new FirebaseModel.OnDeletePostListener() {
+                    @Override
+                    public void onComplete() {
+                        Log.d(LogTag.TAG, "A post " + post.getId() + " was deleted from local DB successfully");
+
+                        Model.instance.postsData.getValue().remove(post);
+                        Model.instance.postsData.setValue(Model.instance.postsData.getValue());
+
+                        if(listener != null) {
+                            listener.onComplete();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public Bitmap fetchPostImageFromLocalCache(String imageUrl) {
         Bitmap bitmap = null;
         try {
             File dir = Environment.getExternalStoragePublicDirectory(
@@ -118,8 +146,6 @@ public class Model {
             out.close();
 
             //addPicureToGallery(imageFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -131,6 +157,10 @@ public class Model {
 
     public void addPostToLocalDB(Post post, PostAsyncDao.PostAsyncDaoListener<Boolean> listener) {
         sqlModel.addPost(post, listener);
+    }
+
+    public void deletePostFromLocalDB(Post post, final PostAsyncDao.PostAsyncDaoListener<Boolean> listener) {
+        sqlModel.deletePost(post, listener);
     }
 
     public void addUserToFirebase(User user, final FirebaseModel.OnCreateNewUserListener listener) {

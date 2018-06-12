@@ -123,6 +123,7 @@ public class PostsListActivity extends AppCompatActivity implements
         Intent toPostDetailsActivity = new Intent(this, PostDetailsActivity.class);
         toPostDetailsActivity.putExtra("postName", selectedPost.getName());
         toPostDetailsActivity.putExtra("postDescription", selectedPost.getDescription());
+        toPostDetailsActivity.putExtra("postImageUrl", selectedPost.getImageUrl());
         startActivity(toPostDetailsActivity);
     }
 

@@ -21,6 +21,7 @@ import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
+import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 import com.example.ben.meallennium.utils.Requests;
 import com.example.ben.meallennium.utils.Results;
@@ -82,20 +83,21 @@ public class AddNewPostActivity extends AppCompatActivity {
                     @Override
                     public void onDone(String url) {
                         if(url != null) {
-                            Log.d("buildTest", "save image in firebase success, imageURL: " + url);
+                            Log.d(LogTag.TAG, "save image in firebase success, imageURL: " + url);
                             newPostIntent.putExtra("imageURL", url);
                             Model.instance.savePostImageToLocalCache(bitmapImage, url);
-
-                            Log.d("buildTest", "save image in local cache success");
+                            Log.d(LogTag.TAG, "save image in local cache success");
+                            setResult(Results.POST_CREATION_SUCCESS, newPostIntent);
+                            finish();
                         } else {
-                            Log.d("buildTest", "save image in firebase failed");
+                            Log.d(LogTag.TAG, "save image in firebase failed");
                         }
                     }
                 });
+            } else {
+                setResult(Results.POST_CREATION_SUCCESS, newPostIntent);
+                finish();
             }
-
-            setResult(Results.POST_CREATION_SUCCESS, newPostIntent);
-            finish();
         });
 
         cancelButton.setOnClickListener((View v) -> {
@@ -127,7 +129,7 @@ public class AddNewPostActivity extends AppCompatActivity {
     }
 
     private Bitmap getRotatedImage(String imageFileUrl) {
-        Log.d("buildTest", "image file url got for ExifInterface: " + imageFileUrl);
+        Log.d(LogTag.TAG, "image file url got for ExifInterface: " + imageFileUrl);
         ExifInterface ei = null;
         Bitmap rotatedBitmap = null;
 
@@ -137,23 +139,23 @@ public class AddNewPostActivity extends AppCompatActivity {
             switch(orientation) {
 
                 case ExifInterface.ORIENTATION_ROTATE_90:
-                    Log.d("buildTest", "image rotated 90 degrees");
+                    Log.d(LogTag.TAG, "image rotated 90 degrees");
                     rotatedBitmap = rotateImage(bitmapImage, 90);
                     break;
 
                 case ExifInterface.ORIENTATION_ROTATE_180:
-                    Log.d("buildTest", "image rotated 180 degrees");
+                    Log.d(LogTag.TAG, "image rotated 180 degrees");
                     rotatedBitmap = rotateImage(bitmapImage, 180);
                     break;
 
                 case ExifInterface.ORIENTATION_ROTATE_270:
-                    Log.d("buildTest", "image rotated 270 degrees");
+                    Log.d(LogTag.TAG, "image rotated 270 degrees");
                     rotatedBitmap = rotateImage(bitmapImage, 270);
                     break;
 
                 case ExifInterface.ORIENTATION_NORMAL:
                 default:
-                    Log.d("buildTest", "image didn't rotate");
+                    Log.d(LogTag.TAG, "image didn't rotate");
                     rotatedBitmap = bitmapImage;
             }
         } catch (IOException e) {

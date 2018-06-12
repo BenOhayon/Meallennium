@@ -33,6 +33,7 @@
 
         <activity
             android:name=".activities.WelcomeScreenActivity"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         </activity>

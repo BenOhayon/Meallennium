@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
+import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -58,6 +59,10 @@ public class FirebaseModel {
         void onDone(String url);
     }
 
+    public interface OnDeletePostListener {
+        void onComplete();
+    }
+
     private FirebaseAuth auth;
     private DatabaseReference dbRef;
     private User signedInUser;
@@ -94,10 +99,10 @@ public class FirebaseModel {
             public void onComplete(@NonNull Task<Uri> task) {
                 if(task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
-                    Log.d("buildTest", "Download Uri task success, download Uri: " + downloadUri);
+                    Log.d(LogTag.TAG, "Download Uri task success, download Uri: " + downloadUri);
                     listener.onDone(downloadUri.toString());
                 } else {
-                    Log.d("buildTest", "Download Uri task failed");
+                    Log.d(LogTag.TAG, "Download Uri task failed");
                 }
             }
         });
@@ -111,10 +116,10 @@ public class FirebaseModel {
         auth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
                 .addOnCompleteListener((Task<AuthResult> task) -> {
                     if(task.isSuccessful()) {
-                        Log.d("buildTest", "Firebase registration successful!");
+                        Log.d(LogTag.TAG, "Firebase registration successful!");
                         listener.onCreationComplete(user);
                     } else {
-                        Log.d("buildTest", "Firebase registration failed: " + task.getException());
+                        Log.d(LogTag.TAG, "Firebase registration failed: " + task.getException());
                         listener.onCreationComplete(null);
                     }
                 });
@@ -124,11 +129,11 @@ public class FirebaseModel {
         auth.signInWithEmailAndPassword(user.getEmail(), user.getPassword())
                 .addOnCompleteListener((Task<AuthResult> task) -> {
                     if(task.isSuccessful()) {
-                        Log.d("buildTest", "Firebase sign in successful!");
+                        Log.d(LogTag.TAG, "Firebase sign in successful!");
                         listener.onSignInComplete(user);
                         signedInUser = user;
                     } else {
-                        Log.d("buildTest", "Firebase sign in failed: " + task.getException());
+                        Log.d(LogTag.TAG, "Firebase sign in failed: " + task.getException());
                         listener.onSignInComplete(null);
                     }
                 });
@@ -142,7 +147,7 @@ public class FirebaseModel {
             user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    Log.d("buildTest", "User re-authenticated.");
+                    Log.d(LogTag.TAG, "User re-authenticated.");
                 }
             });
 
@@ -150,7 +155,7 @@ public class FirebaseModel {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
-                        Log.d("buildTest", "User account deleted.");
+                        Log.d(LogTag.TAG, "User account deleted.");
                         listener.onDeletionComplete(signedInUser);
                         signedInUser = null;
                     }
@@ -179,13 +184,13 @@ public class FirebaseModel {
                     posts.add(post);
                 }
 
-                Log.d("buildTest", "onDataChange() called on firebase");
+                Log.d(LogTag.TAG, "onDataChange() called on firebase");
                 listener.onComplete(posts);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("buildTest", "onCancelled() called in firebase");
+                Log.d(LogTag.TAG, "onCancelled() called in firebase");
                 listener.onComplete(null);
             }
         });
@@ -196,20 +201,31 @@ public class FirebaseModel {
         ref.removeEventListener(valueEventListener);
     }
 
+    public void deletePost(Post post, final OnDeletePostListener listener) {
+        DatabaseReference postRef = dbRef.child("Posts").child(post.getId());
+        postRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(LogTag.TAG, "A post " + post.getId() + " was deleted from Firebase successfully");
+                listener.onComplete();
+            }
+        });
+    }
+
     public void createNewPost(Post post, final OnCreateNewPostListener listener) {
-        Log.d("buildTest", "creating a new post in FirebaseModel.");
+        Log.d(LogTag.TAG, "creating a new post in FirebaseModel.");
         DatabaseReference postsRef = dbRef.child("Posts").child(post.getId());
         postsRef.setValue(post).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Log.d("buildTest", "Create new post success!");
+                Log.d(LogTag.TAG, "Create new post success!");
                 listener.onComplete(post);
             }
         })
         .addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d("buildTest", "Creating a new post in Firebase failed.");
+                Log.d(LogTag.TAG, "Creating a new post in Firebase failed.");
                 listener.onComplete(null);
             }
         });

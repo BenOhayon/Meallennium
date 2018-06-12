@@ -91,7 +91,7 @@ public class PostsListFragment extends Fragment {
                 postItemName.setText(post.getName());
                 Log.d("buildTest", "checking the image url: " + post.getImageUrl());
                 if(post.getImageUrl() != null) {
-                    postImage.setImageBitmap(Model.instance.fetchPostImageFromLocalDB(post.getImageUrl()));
+                    postImage.setImageBitmap(Model.instance.fetchPostImageFromLocalCache(post.getImageUrl()));
                     Log.d("buildTest", "post image was set");
                 }
             }

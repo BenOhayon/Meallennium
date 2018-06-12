@@ -31,9 +31,15 @@ public class Post {
 
     @Ignore
     public Post(String name, String description) {
+        this(name, description, null);
+    }
+
+    @Ignore
+    public Post(String name, String description, String imageUrl) {
         this.id = generatePostId();
         this.name = name;
         this. description = description;
+        this.imageUrl = imageUrl;
     }
 
     private String generatePostId() {
