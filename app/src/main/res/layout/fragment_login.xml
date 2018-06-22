@@ -90,22 +90,30 @@
             android:id="@+id/loginScreen__loginButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
+            android:background="@drawable/oval_style"
+            android:drawableStart="@mipmap/v_sign"
             android:text="Login" />
 
         <Button
             android:id="@+id/loginScreen__cancelButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
+            android:background="@drawable/oval_style"
+            android:drawableStart="@mipmap/x_sign"
             android:text="Cancel" />
     </LinearLayout>
 
     <ProgressBar
         android:id="@+id/loginScreen__progressBar"
-        style="@style/Base.Widget.AppCompat.ProgressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="92dp"
+        android:layout_height="80dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"

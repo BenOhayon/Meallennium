@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -36,6 +37,11 @@ public class PostsListActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_posts_list);
+
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setTitle("Welcome, " + getSharedPreferences("SP", MODE_PRIVATE).getString("userName", "default name"));
+        }
 
         handleIntent(getIntent());
 
@@ -121,9 +127,9 @@ public class PostsListActivity extends AppCompatActivity implements
         Post selectedPost = Model.instance.getPostsData().getValue().get(clickedItemIndex);
 
         Intent toPostDetailsActivity = new Intent(this, PostDetailsActivity.class);
-        toPostDetailsActivity.putExtra("postName", selectedPost.getName());
-        toPostDetailsActivity.putExtra("postDescription", selectedPost.getDescription());
-        toPostDetailsActivity.putExtra("postImageUrl", selectedPost.getImageUrl());
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("Post",selectedPost);
+        toPostDetailsActivity.putExtras(bundle);
         startActivity(toPostDetailsActivity);
     }
 

@@ -6,10 +6,11 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Random;
 
 @Entity
-public class Post {
+public class Post implements Serializable{
 
     private static final int ID_LENGTH = 12;
 
@@ -27,6 +28,7 @@ public class Post {
     @ColumnInfo(name = "Image URL")
     private String imageUrl;
 
+    @Ignore
     public Post() {}
 
     @Ignore
@@ -34,7 +36,6 @@ public class Post {
         this(name, description, null);
     }
 
-    @Ignore
     public Post(String name, String description, String imageUrl) {
         this.id = generatePostId();
         this.name = name;

@@ -21,6 +21,7 @@ import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.viewmodels.PostsListViewModel;
+import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 
 import java.util.List;
@@ -50,7 +51,7 @@ public class PostsListFragment extends Fragment {
 
         @NonNull
         @Override
-        public PostsListAdapter.PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
             // TODO Check again how RecyclerView's Views and ViewHolders work together and decide where to perform the post image fetching.
 
@@ -89,11 +90,13 @@ public class PostsListFragment extends Fragment {
 
                 Post post = Model.instance.getPostsData().getValue().get(listIndex);
                 postItemName.setText(post.getName());
-                Log.d("buildTest", "checking the image url: " + post.getImageUrl());
-                if(post.getImageUrl() != null) {
-                    postImage.setImageBitmap(Model.instance.fetchPostImageFromLocalCache(post.getImageUrl()));
-                    Log.d("buildTest", "post image was set");
-                }
+                postImage.setImageResource(R.drawable.add);
+//                Model.instance.fetchPostImageFromLocalCache(post.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
+//                    @Override
+//                    public void onComplete(String imageUrl) {
+//
+//                    }
+//                });
             }
 
             @Override

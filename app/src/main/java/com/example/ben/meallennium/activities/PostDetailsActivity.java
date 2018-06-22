@@ -15,6 +15,7 @@ import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.sql.room_db_wrapper.PostAsyncDao;
+import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 
 public class PostDetailsActivity extends AppCompatActivity {
@@ -37,14 +38,13 @@ public class PostDetailsActivity extends AppCompatActivity {
         ProgressBar progressBar = findViewById(R.id.postDetails__progressBar);
         ProgressBarManager.bindProgressBar(progressBar);
 
-        Intent fromPostsListActivity = getIntent();
-        String name = fromPostsListActivity.getStringExtra("postName");
-        String desc = fromPostsListActivity.getStringExtra("postDescription");
-        String imageUrl = fromPostsListActivity.getStringExtra("postImageUrl");
-        Post post = new Post(name, desc, imageUrl);
 
-        postNameTv.setText(name);
-        postDescTv.setText(desc);
+        Bundle bundle = getIntent().getExtras();
+        Post post = (Post)bundle.getSerializable("Post");
+        Log.d(LogTag.TAG,post.getId() + "LOGTAGLOGTAG");
+
+        postNameTv.setText(post.getName());
+        postDescTv.setText(post.getDescription());
 
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override

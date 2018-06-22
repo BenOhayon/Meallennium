@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,30 +8,52 @@
     tools:context=".fragments.WelcomeScreenFragment">
 
     <LinearLayout
-        android:layout_width="282dp"
-        android:layout_height="316dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:orientation="horizontal"
+        android:weightSum="2.0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcomeScreen__Title">
+        app:layout_constraintTop_toBottomOf="@+id/welcomeScreen__Title"
+        app:layout_constraintVertical_bias="0.7">
 
         <Button
             android:id="@+id/welcomeScreen__registrationButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Registration" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1.0"
+            android:background="@drawable/oval_style"
+            android:drawableStart="@mipmap/registration_btn_icon"
+            android:text="Registration"
+            android:textAlignment="center" />
 
         <Button
             android:id="@+id/welcomeScreen__loginButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1.0"
+            android:background="@drawable/oval_style"
+            android:drawableStart="@mipmap/login_btn_icon"
             android:text="Login" />
     </LinearLayout>
+
+    <!-- <?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <stroke
+        android:width="3dp"
+        android:color="#000000" />
+
+    <solid android:color="#2f0ae4" />
+</shape>-->
 
     <TextView
         android:id="@+id/welcomeScreen__Title"

@@ -8,19 +8,14 @@ import android.util.Log;
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.utils.LogTag;
-import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -30,7 +25,6 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 public class FirebaseModel {
@@ -64,14 +58,10 @@ public class FirebaseModel {
     }
 
     private FirebaseAuth auth;
-    private DatabaseReference dbRef;
     private User signedInUser;
-
-    private ValueEventListener valueEventListener;
 
     public FirebaseModel() {
         auth = FirebaseAuth.getInstance();
-        dbRef = FirebaseDatabase.getInstance().getReference();
     }
 
     public void saveImage(Bitmap image, final OnSaveImageListener listener) {
@@ -173,61 +163,19 @@ public class FirebaseModel {
         auth.signOut();
     }
 
-    public void fetchAllPostsData(final OnFetchAllPostsListener listener) {
-        DatabaseReference postsRef = dbRef.child("Posts");
-        valueEventListener = postsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<Post> posts = new LinkedList<>();
-                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    Post post = postSnapshot.getValue(Post.class);
-                    posts.add(post);
-                }
-
-                Log.d(LogTag.TAG, "onDataChange() called on firebase");
-                listener.onComplete(posts);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(LogTag.TAG, "onCancelled() called in firebase");
-                listener.onComplete(null);
-            }
-        });
+    public void fetchAllPosts(final OnFetchAllPostsListener listener) {
+        PostFirebase.fetchAllPosts(listener);
     }
 
     public void cancelFetchingData() {
-        DatabaseReference ref = dbRef.child("Posts");
-        ref.removeEventListener(valueEventListener);
+        PostFirebase.cancelFetchingData();
     }
 
     public void deletePost(Post post, final OnDeletePostListener listener) {
-        DatabaseReference postRef = dbRef.child("Posts").child(post.getId());
-        postRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(LogTag.TAG, "A post " + post.getId() + " was deleted from Firebase successfully");
-                listener.onComplete();
-            }
-        });
+        PostFirebase.deletePost(post, listener);
     }
 
     public void createNewPost(Post post, final OnCreateNewPostListener listener) {
-        Log.d(LogTag.TAG, "creating a new post in FirebaseModel.");
-        DatabaseReference postsRef = dbRef.child("Posts").child(post.getId());
-        postsRef.setValue(post).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(LogTag.TAG, "Create new post success!");
-                listener.onComplete(post);
-            }
-        })
-        .addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(LogTag.TAG, "Creating a new post in Firebase failed.");
-                listener.onComplete(null);
-            }
-        });
+        PostFirebase.createNewPost(post, listener);
     }
 }

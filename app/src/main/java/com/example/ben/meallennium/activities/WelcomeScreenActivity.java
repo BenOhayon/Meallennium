@@ -1,6 +1,7 @@
 package com.example.ben.meallennium.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -35,10 +36,10 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
         if(Model.instance.isSignedInUserInFirebase()) {
             Log.d("buildTest", "Moving to post list activity");
             moveToPostListActivity();
-        } else {
-            WelcomeScreenFragment welcomeScreenFragment = new WelcomeScreenFragment();
-            FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_welcome_screen_container, welcomeScreenFragment, false);
         }
+
+        WelcomeScreenFragment welcomeScreenFragment = new WelcomeScreenFragment();
+        FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_welcome_screen_container, welcomeScreenFragment, false);
     }
 
     // --------------------
@@ -64,6 +65,11 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
             public void onCreationComplete(User user) {
                 if(user != null) {
                     Model.instance.setSignedInUserInFirebase(user);
+
+                    SharedPreferences.Editor sharedEditor = getSharedPreferences("SP", MODE_PRIVATE).edit();
+                    sharedEditor.putString("userName", user.getUsername());
+                    sharedEditor.commit();
+
                     ProgressBarManager.dismissProgressBar();
                     ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, "The user " + user + " signed up!");
                     moveToPostListActivity();
@@ -82,6 +88,11 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
             public void onSignInComplete(User user) {
                 if(user != null) {
                     Model.instance.setSignedInUserInFirebase(user);
+
+                    SharedPreferences.Editor sharedEditor = getSharedPreferences("SP", MODE_PRIVATE).edit();
+                    sharedEditor.putString("userName", user.getUsername());
+                    sharedEditor.commit();
+
                     ProgressBarManager.dismissProgressBar();
                     ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, "A user has signed in!");
                     moveToPostListActivity();

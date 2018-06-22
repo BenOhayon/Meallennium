@@ -25,10 +25,20 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+// TODO Eliav comments:
+// TODO Add ViewModels to every activity and fragment.
+// TODO Delete classes: PostSql & SqlModel, PostDao has all the functionality needed for Post table in local DB.
+// TODO Improve the design in the app screens.
+// TODO Add Edit Post option.
+
 public class Model {
 
     public interface OnOperationCompleteListener {
         void onComplete();
+    }
+
+    public interface OnFetchImageFromLocalCacheListener {
+        void onComplete(String imageUrl);
     }
 
     public static Model instance = new Model();
@@ -37,8 +47,6 @@ public class Model {
     private PostsListLiveData postsData;
 
     class PostsListLiveData extends MutableLiveData<List<Post>> {
-
-        int x = 0;
 
         public PostsListLiveData() {
             setValue(new LinkedList<>());
@@ -52,23 +60,31 @@ public class Model {
                 public void onComplete(List<Post> postsFromDB) {
                     Log.d(LogTag.TAG, "Got " + postsFromDB.size() + " posts from local DB");
                     setValue(postsFromDB);
-                    firebaseModel.fetchAllPostsData(new FirebaseModel.OnFetchAllPostsListener() {
+                    firebaseModel.fetchAllPosts(new FirebaseModel.OnFetchAllPostsListener() {
                         @Override
                         public void onComplete(List<Post> postsFromFirebase) {
-                            Log.d(LogTag.TAG, "Got " + postsFromFirebase.size() + " posts from Firebase");
-                            List<Post> temp = new LinkedList<>();
-                            temp.addAll(postsFromDB);
-                            List<Post> deltaPostsList = getDeltaList(postsFromDB, postsFromFirebase);
-                            Log.d(LogTag.TAG, "deltaList size: " + deltaPostsList.size());
-                            if (deltaPostsList.size() != 0) {
-                                temp.addAll(deltaPostsList);
-                                setValue(temp);
-                            }
-                            sqlModel.addPosts(deltaPostsList, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
+                            Log.d(LogTag.TAG, "Updating the posts list from Firebase");
+                            setValue(postsFromFirebase);
+//                            Log.d(LogTag.TAG, "Got " + postsFromFirebase.size() + " posts from Firebase");
+//                            List<Post> temp = new LinkedList<>();
+//                            temp.addAll(postsFromDB);
+//                            List<Post> deltaPostsList = getDeltaList(postsFromDB, postsFromFirebase);
+//                            Log.d(LogTag.TAG, "deltaList size: " + deltaPostsList.size());
+//                            if (deltaPostsList.size() != 0) {
+//                                temp.addAll(deltaPostsList);
+//                                setValue(temp);
+//                            }
+
+                            PostAsyncDao.deleteAllPosts(postsFromDB, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
                                 @Override
                                 public void onComplete(Boolean result) {
-                                    Log.d(LogTag.TAG, "Posts saved in local DB");
-                                    ProgressBarManager.dismissProgressBar();
+                                    sqlModel.addPosts(postsFromFirebase, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
+                                        @Override
+                                        public void onComplete(Boolean result) {
+                                            Log.d(LogTag.TAG, "Posts saved in local DB");
+                                            ProgressBarManager.dismissProgressBar();
+                                        }
+                                    });
                                 }
                             });
                         }
@@ -114,7 +130,7 @@ public class Model {
         });
     }
 
-    public Bitmap fetchPostImageFromLocalCache(String imageUrl) {
+    public Bitmap fetchPostImageFromLocalCache(String imageUrl, final OnFetchImageFromLocalCacheListener listener) {
         Bitmap bitmap = null;
         try {
             File dir = Environment.getExternalStoragePublicDirectory(
@@ -122,7 +138,8 @@ public class Model {
             File imageFile = new File(dir,imageUrl);
             InputStream inputStream = new FileInputStream(imageFile);
             bitmap = BitmapFactory.decodeStream(inputStream);
-            Log.d("tag","got image from cache: " + imageUrl);
+            Log.d(LogTag.TAG,"got image from cache: " + imageUrl);
+            listener.onComplete(imageUrl);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -157,10 +174,6 @@ public class Model {
 
     public void addPostToLocalDB(Post post, PostAsyncDao.PostAsyncDaoListener<Boolean> listener) {
         sqlModel.addPost(post, listener);
-    }
-
-    public void deletePostFromLocalDB(Post post, final PostAsyncDao.PostAsyncDaoListener<Boolean> listener) {
-        sqlModel.deletePost(post, listener);
     }
 
     public void addUserToFirebase(User user, final FirebaseModel.OnCreateNewUserListener listener) {

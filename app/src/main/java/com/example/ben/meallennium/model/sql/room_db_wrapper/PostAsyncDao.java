@@ -97,4 +97,28 @@ public class PostAsyncDao {
         MyAsyncTask task = new MyAsyncTask();
         task.execute(postToDelete);
     }
+
+    public static void deleteAllPosts(List<Post> postsToDelete, final PostAsyncDaoListener<Boolean> listener) {
+        class MyAsyncTask extends AsyncTask<List<Post>, String, Boolean> {
+            @Override
+            protected Boolean doInBackground(List<Post>... post) {
+                for(Post p : post[0]) {
+                    MillenniumDatabase.db.postDao().deletePost(p);
+                }
+
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean posts) {
+                super.onPostExecute(posts);
+                if(listener != null) {
+                    listener.onComplete(posts);
+                }
+            }
+        }
+
+        MyAsyncTask task = new MyAsyncTask();
+        task.execute(postsToDelete);
+    }
 }

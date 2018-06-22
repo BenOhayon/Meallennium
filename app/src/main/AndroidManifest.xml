@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+
+
     <!--
      In order to disable automatic layout invert, remove the attribute:
     android:supportsRtl.

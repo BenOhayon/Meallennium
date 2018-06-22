@@ -95,7 +95,7 @@
 
     <LinearLayout
         android:id="@+id/linearLayout3"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
@@ -109,16 +109,24 @@
 
         <Button
             android:id="@+id/registerScreen__registerButton"
-            android:layout_width="wrap_content"
+            android:layout_width="113dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
+            android:background="@drawable/oval_style"
+            android:drawableStart="@mipmap/v_sign"
             android:text="Register" />
 
         <Button
             android:id="@+id/registerScreen__cancelButton"
-            android:layout_width="wrap_content"
+            android:layout_width="125dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
+            android:background="@drawable/oval_style"
+            android:drawableStart="@mipmap/x_sign"
             android:text="Cancel" />
     </LinearLayout>
 
