@@ -114,7 +114,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:background="@drawable/oval_style"
+            android:backgrond="@drawable/oval_style"
             android:drawableStart="@mipmap/v_sign"
             android:text="Register" />
 
