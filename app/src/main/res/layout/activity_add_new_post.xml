@@ -37,17 +37,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/createPostScreen__title" />
 
-        <TextView
-            android:id="@+id/textView11"
-            android:layout_width="wrap_content"
-            android:layout_height="33dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="72dp"
-            android:text="Post name:"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/createPostScreen__imageSelect" />
-
         <android.support.design.widget.TextInputLayout
             android:id="@+id/textInputLayout"
             android:layout_width="0dp"
@@ -55,12 +44,11 @@
             android:layout_marginBottom="10dp"
             android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView11"
-            app:layout_constraintVertical_bias="0.3">
+            app:layout_constraintTop_toBottomOf="@+id/createPostScreen__postNameEt">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/createPostScreen__postDescTextArea"
@@ -75,14 +63,15 @@
             android:id="@+id/createPostScreen__postNameEt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
             android:ems="10"
+            android:hint="Give a name to the post"
             android:inputType="textPersonName"
-            app:layout_constraintBaseline_toBaselineOf="@+id/textView11"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/textView11" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/createPostScreen__imageSelect" />
 
         <LinearLayout
             android:id="@+id/linearLayout"

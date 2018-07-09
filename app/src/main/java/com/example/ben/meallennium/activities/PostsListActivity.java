@@ -128,7 +128,7 @@ public class PostsListActivity extends AppCompatActivity implements
 
         Intent toPostDetailsActivity = new Intent(this, PostDetailsActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("Post",selectedPost);
+        bundle.putSerializable("Post", selectedPost);
         toPostDetailsActivity.putExtras(bundle);
         startActivity(toPostDetailsActivity);
     }

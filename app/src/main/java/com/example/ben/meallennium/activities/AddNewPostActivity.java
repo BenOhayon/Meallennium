@@ -54,7 +54,6 @@ public class AddNewPostActivity extends AppCompatActivity {
         ProgressBarManager.bindProgressBar(loadingProgressBar);
 
         takePictureButton.setOnClickListener(v -> {
-            //open camera
             Intent takePictureIntent = new Intent(
                     MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {

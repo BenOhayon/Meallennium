@@ -122,10 +122,6 @@ public class PostsListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_posts_list, container, false);
 
-        ProgressBar loadingProgressBar = view.findViewById(R.id.postsListScreen__progressBar);
-        ProgressBarManager.bindProgressBar(loadingProgressBar);
-        ProgressBarManager.showProgressBar();
-
         RecyclerView postsList = view.findViewById(R.id.postsListScreen__list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         postsList.setLayoutManager(layoutManager);

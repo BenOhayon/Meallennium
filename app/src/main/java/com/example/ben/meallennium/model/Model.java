@@ -28,17 +28,13 @@ import java.util.List;
 // TODO Eliav comments:
 // TODO Add ViewModels to every activity and fragment.
 // TODO Improve the design in the app screens.
-// TODO Add Edit Post option.
+// TODO Add Edit Post option: make sure to validate the edit operation in local DB and Firebase.
 
 public class Model {
 
     public interface OnOperationCompleteListener {
         void onComplete();
     }
-
-//    public interface OnFetchImageFromLocalCacheListener {
-//        void onComplete(String imageUrl);
-//    }
 
     public interface OnFetchImageFromLocalCacheListener {
         void onComplete(Bitmap pic);
@@ -152,7 +148,7 @@ public class Model {
         }
     }
 
-    public Bitmap fetchPostImageFromLocalCache(String imageUrl) {
+    private Bitmap fetchPostImageFromLocalCache(String imageUrl) {
         Bitmap bitmap = null;
         try {
             File dir = Environment.getExternalStoragePublicDirectory(
@@ -225,8 +221,12 @@ public class Model {
         firebaseModel.createNewPost(post, listener);
     }
 
-    public LiveData<List<Post>> getPostsData() {
+    public MutableLiveData<List<Post>> getPostsData() {
         return postsData;
+    }
+
+    public void setPostsData(List<Post> data) {
+        getPostsData().setValue(data);
     }
 
     private List<Post> getDeltaList(List<Post> source, List<Post> getDeltaFrom) {

@@ -1,5 +1,6 @@
 package com.example.ben.meallennium.activities;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -12,12 +13,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
+import com.example.ben.meallennium.fragments.EditPostFragment;
+import com.example.ben.meallennium.fragments.PostDetailsFragment;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
+import com.example.ben.meallennium.utils.FragmentTransactions;
 import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 
-public class PostDetailsActivity extends AppCompatActivity {
+public class PostDetailsActivity extends AppCompatActivity implements
+        PostDetailsFragment.OnDeleteButtonClicked,
+        EditPostFragment.OnCancelButtonClicked,
+        EditPostFragment.OnEditCompleteListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,49 +36,10 @@ public class PostDetailsActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-
-        ImageView postImage = findViewById(R.id.postDetails__postImage);
-        TextView postNameTv = findViewById(R.id.postDetails__postNameTv);
-        TextView postDescTv = findViewById(R.id.postDetails__postDescTv);
-        Button editButton = findViewById(R.id.postDetails__editButton);
-        Button deleteButton = findViewById(R.id.postDetails__deleteButton);
-        ProgressBar progressBar = findViewById(R.id.postDetails__progressBar);
-        ProgressBarManager.bindProgressBar(progressBar);
-
-
-        Bundle bundle = getIntent().getExtras();
-        Post post = (Post)bundle.getSerializable("Post");
-
-        postNameTv.setText(post.getName());
-        postDescTv.setText(post.getDescription());
-        ProgressBarManager.showProgressBar();
-        Model.instance.loadImage(post.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
-            @Override
-            public void onComplete(Bitmap pic) {
-                postImage.setImageBitmap(pic);
-                ProgressBarManager.dismissProgressBar();
-            }
-        });
-
-        editButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ProgressBarManager.showProgressBar();
-                Model.instance.deletePost(post, new Model.OnOperationCompleteListener() {
-                    @Override
-                    public void onComplete() {
-                        finish();
-                    }
-                });
-            }
-        });
+        Intent fromPostListActivity = getIntent();
+        PostDetailsFragment postDetailsFragment = new PostDetailsFragment();
+        postDetailsFragment.setArguments(fromPostListActivity.getExtras());
+        FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_post_details_container, postDetailsFragment, false);
     }
 
     /*
@@ -82,5 +50,20 @@ public class PostDetailsActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         finish();
         return true;
+    }
+
+    @Override
+    public void onEditDone() {
+        finish();
+    }
+
+    @Override
+    public void onCancel() {
+        getSupportFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void onDelete() {
+        finish();
     }
 }
