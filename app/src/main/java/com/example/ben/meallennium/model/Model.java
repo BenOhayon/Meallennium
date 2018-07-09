@@ -6,12 +6,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Log;
+import android.webkit.URLUtil;
 
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
-import com.example.ben.meallennium.model.sql.SqlModel;
-import com.example.ben.meallennium.model.sql.room_db_wrapper.PostAsyncDao;
+import com.example.ben.meallennium.model.sql.PostAsyncDao;
 import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 
@@ -27,7 +27,6 @@ import java.util.List;
 
 // TODO Eliav comments:
 // TODO Add ViewModels to every activity and fragment.
-// TODO Delete classes: PostSql & SqlModel, PostDao has all the functionality needed for Post table in local DB.
 // TODO Improve the design in the app screens.
 // TODO Add Edit Post option.
 
@@ -37,12 +36,15 @@ public class Model {
         void onComplete();
     }
 
+//    public interface OnFetchImageFromLocalCacheListener {
+//        void onComplete(String imageUrl);
+//    }
+
     public interface OnFetchImageFromLocalCacheListener {
-        void onComplete(String imageUrl);
+        void onComplete(Bitmap pic);
     }
 
     public static Model instance = new Model();
-    private SqlModel sqlModel;
     private FirebaseModel firebaseModel;
     private PostsListLiveData postsData;
 
@@ -55,7 +57,7 @@ public class Model {
         @Override
         protected void onActive() {
             super.onActive();
-            sqlModel.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
+            PostAsyncDao.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
                 @Override
                 public void onComplete(List<Post> postsFromDB) {
                     Log.d(LogTag.TAG, "Got " + postsFromDB.size() + " posts from local DB");
@@ -64,25 +66,23 @@ public class Model {
                         @Override
                         public void onComplete(List<Post> postsFromFirebase) {
                             Log.d(LogTag.TAG, "Updating the posts list from Firebase");
-                            setValue(postsFromFirebase);
-//                            Log.d(LogTag.TAG, "Got " + postsFromFirebase.size() + " posts from Firebase");
-//                            List<Post> temp = new LinkedList<>();
-//                            temp.addAll(postsFromDB);
-//                            List<Post> deltaPostsList = getDeltaList(postsFromDB, postsFromFirebase);
-//                            Log.d(LogTag.TAG, "deltaList size: " + deltaPostsList.size());
-//                            if (deltaPostsList.size() != 0) {
-//                                temp.addAll(deltaPostsList);
-//                                setValue(temp);
-//                            }
-
+                            Log.d(LogTag.TAG, "Got " + postsFromFirebase.size() + " posts from Firebase");
+                            List<Post> temp = new LinkedList<>();
+                            temp.addAll(postsFromDB);
+                            List<Post> deltaPostsList = getDeltaList(postsFromDB, postsFromFirebase);
+                            Log.d(LogTag.TAG, "deltaList size: " + deltaPostsList.size());
+                            if (deltaPostsList.size() != 0) {
+                                temp.addAll(deltaPostsList);
+                                setValue(temp);
+                            }
+                            ProgressBarManager.dismissProgressBar();
                             PostAsyncDao.deleteAllPosts(postsFromDB, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
                                 @Override
                                 public void onComplete(Boolean result) {
-                                    sqlModel.addPosts(postsFromFirebase, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
+                                    PostAsyncDao.addPosts(temp, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
                                         @Override
                                         public void onComplete(Boolean result) {
                                             Log.d(LogTag.TAG, "Posts saved in local DB");
-                                            ProgressBarManager.dismissProgressBar();
                                         }
                                     });
                                 }
@@ -105,12 +105,11 @@ public class Model {
         Log.d(LogTag.TAG, "Model is created");
         postsData = new PostsListLiveData();
         firebaseModel = new FirebaseModel();
-        sqlModel = new SqlModel();
         postsData = new PostsListLiveData();
     }
 
     public void deletePost(Post post, final OnOperationCompleteListener listener) {
-        sqlModel.deletePost(post, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
+        PostAsyncDao.deletePost(post, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
             @Override
             public void onComplete(Boolean result) {
                 firebaseModel.deletePost(post, new FirebaseModel.OnDeletePostListener() {
@@ -130,7 +129,30 @@ public class Model {
         });
     }
 
-    public Bitmap fetchPostImageFromLocalCache(String imageUrl, final OnFetchImageFromLocalCacheListener listener) {
+    public void loadImage(String imageUrl, final OnFetchImageFromLocalCacheListener listener){
+        String localFileName = URLUtil.guessFileName(imageUrl, null, null);
+        final Bitmap image = fetchPostImageFromLocalCache(localFileName);
+        if (image == null) {
+            firebaseModel.getImage(imageUrl, new FirebaseModel.OnGetImageListener() {
+                @Override
+                public void onDone(Bitmap pic) {
+                    if (pic == null) {
+                        listener.onComplete(null);
+                    } else {
+                        String localFileName = URLUtil.guessFileName(imageUrl, null, null);
+                        Log.d("TAG", "save image to cache: " + localFileName);
+                        savePostImageToLocalCache(pic, localFileName);
+                        listener.onComplete(pic);
+                    }
+                }
+            });
+        }else {
+            Log.d("TAG","OK reading cache image: " + localFileName);
+            listener.onComplete(image);
+        }
+    }
+
+    public Bitmap fetchPostImageFromLocalCache(String imageUrl) {
         Bitmap bitmap = null;
         try {
             File dir = Environment.getExternalStoragePublicDirectory(
@@ -138,8 +160,7 @@ public class Model {
             File imageFile = new File(dir,imageUrl);
             InputStream inputStream = new FileInputStream(imageFile);
             bitmap = BitmapFactory.decodeStream(inputStream);
-            Log.d(LogTag.TAG,"got image from cache: " + imageUrl);
-            listener.onComplete(imageUrl);
+            Log.d(LogTag.TAG,"got image from cache: " + imageUrl + ", is null: " + (bitmap == null));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -173,7 +194,7 @@ public class Model {
     }
 
     public void addPostToLocalDB(Post post, PostAsyncDao.PostAsyncDaoListener<Boolean> listener) {
-        sqlModel.addPost(post, listener);
+        PostAsyncDao.addPost(post, listener);
     }
 
     public void addUserToFirebase(User user, final FirebaseModel.OnCreateNewUserListener listener) {

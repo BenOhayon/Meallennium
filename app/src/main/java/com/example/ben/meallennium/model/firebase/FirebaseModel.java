@@ -1,6 +1,7 @@
 package com.example.ben.meallennium.model.firebase;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -10,15 +11,14 @@ import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.utils.LogTag;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -55,6 +55,10 @@ public class FirebaseModel {
 
     public interface OnDeletePostListener {
         void onComplete();
+    }
+
+    public interface OnGetImageListener {
+        void onDone(Bitmap pic);
     }
 
     private FirebaseAuth auth;
@@ -94,6 +98,27 @@ public class FirebaseModel {
                 } else {
                     Log.d(LogTag.TAG, "Download Uri task failed");
                 }
+            }
+        });
+    }
+
+    public void getImage(String imageUrl, final OnGetImageListener listener) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference httpsReference = storage.getReferenceFromUrl(imageUrl);
+        final long ONE_MEGABYTE = 1024 * 1024;
+        httpsReference.getBytes(3* ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap image = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+                Log.d("TAG","get image from firebase success");
+                listener.onDone(image);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception exception) {
+                Log.d("TAG",exception.getMessage());
+                Log.d("TAG","get image from firebase Failed");
+                listener.onDone(null);
             }
         });
     }

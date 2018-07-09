@@ -1,4 +1,4 @@
-package com.example.ben.meallennium.model.sql.room_db_wrapper;
+package com.example.ben.meallennium.model.sql;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;

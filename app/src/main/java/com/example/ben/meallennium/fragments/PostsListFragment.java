@@ -3,6 +3,7 @@ package com.example.ben.meallennium.fragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -46,15 +47,11 @@ public class PostsListFragment extends Fragment {
 
         public PostsListAdapter(ListItemClickListener listener) {
             this.listener = listener;
-
         }
 
         @NonNull
         @Override
         public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-            // TODO Check again how RecyclerView's Views and ViewHolders work together and decide where to perform the post image fetching.
-
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.posts_list_item,
                     parent, false);
 
@@ -75,28 +72,34 @@ public class PostsListFragment extends Fragment {
         public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             TextView postItemName;
             ImageView postImage;
+            ProgressBar imageProgressBar;
 
             private PostViewHolder(View itemView) {
                 super(itemView);
 
                 postItemName = itemView.findViewById(R.id.postItem_name);
                 postImage = itemView.findViewById(R.id.postItem_image);
+                imageProgressBar = itemView.findViewById(R.id.postItem_progressBar);
                 itemView.setOnClickListener(this);
             }
 
             private void bind(int listIndex) {
 
                 // TODO Figure out how to load the pictures from local cache to the ImageView of the Post items.
-
+                imageProgressBar.setVisibility(View.VISIBLE);
                 Post post = Model.instance.getPostsData().getValue().get(listIndex);
                 postItemName.setText(post.getName());
                 postImage.setImageResource(R.drawable.add);
-//                Model.instance.fetchPostImageFromLocalCache(post.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
-//                    @Override
-//                    public void onComplete(String imageUrl) {
-//
-//                    }
-//                });
+                Model.instance.loadImage(post.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
+                    @Override
+                    public void onComplete(Bitmap pic) {
+                        Log.d(LogTag.TAG, "Retrieving picture from local cache");
+                        if (pic != null) {
+                            postImage.setImageBitmap(pic);
+                            imageProgressBar.setVisibility(View.GONE);
+                        }
+                    }
+                });
             }
 
             @Override

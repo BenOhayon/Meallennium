@@ -1,9 +1,8 @@
-package com.example.ben.meallennium.model.sql.room_db_wrapper;
+package com.example.ben.meallennium.model.sql;
 
 import android.os.AsyncTask;
 
 import com.example.ben.meallennium.model.entities.Post;
-import com.example.ben.meallennium.model.sql.PostSql;
 
 import java.util.List;
 
@@ -13,7 +12,9 @@ public class PostAsyncDao {
         class MyAsyncTask extends AsyncTask<List<Post>, String, Boolean> {
             @Override
             protected Boolean doInBackground(List<Post>... postList) {
-                PostSql.addPosts(postList[0]);
+                for (Post p : postList[0]) {
+                    MillenniumDatabase.db.postDao().addPost(p);
+                }
                 return true;
             }
 
@@ -39,7 +40,7 @@ public class PostAsyncDao {
         class MyAsyncTask extends AsyncTask<String, String, List<Post>> {
             @Override
             protected List<Post> doInBackground(String... strings) {
-                return PostSql.getAllPosts();
+                return MillenniumDatabase.db.postDao().getAllPosts();
             }
 
             @Override
@@ -59,7 +60,7 @@ public class PostAsyncDao {
         class MyAsyncTask extends AsyncTask<Post, String, Boolean> {
             @Override
             protected Boolean doInBackground(Post... postList) {
-                PostSql.addPost(postList[0]);
+                MillenniumDatabase.db.postDao().addPost(postList[0]);
                 return true;
             }
 
@@ -81,7 +82,7 @@ public class PostAsyncDao {
         class MyAsyncTask extends AsyncTask<Post, String, Boolean> {
             @Override
             protected Boolean doInBackground(Post... post) {
-                PostSql.deletePost(post[0]);
+                MillenniumDatabase.db.postDao().deletePost(post[0]);
                 return true;
             }
 

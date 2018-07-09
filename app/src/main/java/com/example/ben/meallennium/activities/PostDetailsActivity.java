@@ -1,20 +1,19 @@
 package com.example.ben.meallennium.activities;
 
-import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
-import com.example.ben.meallennium.model.sql.room_db_wrapper.PostAsyncDao;
 import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 
@@ -31,6 +30,7 @@ public class PostDetailsActivity extends AppCompatActivity {
         }
 
 
+        ImageView postImage = findViewById(R.id.postDetails__postImage);
         TextView postNameTv = findViewById(R.id.postDetails__postNameTv);
         TextView postDescTv = findViewById(R.id.postDetails__postDescTv);
         Button editButton = findViewById(R.id.postDetails__editButton);
@@ -41,10 +41,17 @@ public class PostDetailsActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         Post post = (Post)bundle.getSerializable("Post");
-        Log.d(LogTag.TAG,post.getId() + "LOGTAGLOGTAG");
 
         postNameTv.setText(post.getName());
         postDescTv.setText(post.getDescription());
+        ProgressBarManager.showProgressBar();
+        Model.instance.loadImage(post.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
+            @Override
+            public void onComplete(Bitmap pic) {
+                postImage.setImageBitmap(pic);
+                ProgressBarManager.dismissProgressBar();
+            }
+        });
 
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
