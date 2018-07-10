@@ -18,12 +18,6 @@
             <group
                 android:id="@+id/group1">
                 <item
-                    android:id="@+id/actionMenu__add"
-                    android:title="Add New Post"
-                    android:icon="@drawable/add"
-                    app:showAsAction="never" />
-
-                <item
                     android:id="@+id/actionMenu__about"
                     android:orderInCategory="100"
                     android:icon="@drawable/about"

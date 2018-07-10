@@ -66,11 +66,6 @@ public class PostsListActivity extends AppCompatActivity implements
                 startActivity(toAboutScreen);
                 break;
 
-            case R.id.actionMenu__add:
-                Intent toCreatePostScreen = new Intent(this, AddNewPostActivity.class);
-                startActivityForResult(toCreatePostScreen, Requests.NEW_POST_REQUEST);
-                break;
-
             case R.id.actionMenu__deleteAccount:
                 new DeleteAccountConfirmationDialog().show(getSupportFragmentManager(), "TAG");
                 break;
@@ -123,7 +118,7 @@ public class PostsListActivity extends AppCompatActivity implements
     // --------------------
 
     @Override
-    public void onListItemSelect(int clickedItemIndex) {
+    public void onListItemClick(int clickedItemIndex) {
         Post selectedPost = Model.instance.getPostsData().getValue().get(clickedItemIndex);
 
         Intent toPostDetailsActivity = new Intent(this, PostDetailsActivity.class);
@@ -131,6 +126,11 @@ public class PostsListActivity extends AppCompatActivity implements
         bundle.putSerializable("Post", selectedPost);
         toPostDetailsActivity.putExtras(bundle);
         startActivity(toPostDetailsActivity);
+    }
+
+    @Override
+    public void onAddFabClick() {
+        moveToAddNewPostActivity();
     }
 
     // ----------------------------
@@ -157,5 +157,10 @@ public class PostsListActivity extends AppCompatActivity implements
                 }
             }
         }
+    }
+
+    private void moveToAddNewPostActivity() {
+        Intent toCreatePostScreen = new Intent(this, AddNewPostActivity.class);
+        startActivityForResult(toCreatePostScreen, Requests.NEW_POST_REQUEST);
     }
 }

@@ -3,9 +3,11 @@ package com.example.ben.meallennium.fragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,33 +21,36 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
+import com.example.ben.meallennium.activities.AddNewPostActivity;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
+import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.model.viewmodels.PostsListViewModel;
 import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.ProgressBarManager;
+import com.example.ben.meallennium.utils.Requests;
+import com.example.ben.meallennium.utils.Results;
 
 import java.util.List;
 
 public class PostsListFragment extends Fragment {
 
+    public interface PostsListFragmentListener {
+        void onListItemClick(int clickedItemIndex);
+        void onAddFabClick();
+    }
+
     private PostsListViewModel postsViewModel;
     private PostsListAdapter adapter;
+    private FloatingActionButton addFab;
+
     private PostsListFragmentListener listener;
-
-    public interface PostsListFragmentListener {
-        void onListItemSelect(int clickedItemIndex);
-    }
-
-    interface ListItemClickListener {
-        void onListItemClick(int clickedItemIndex);
-    }
 
     class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostViewHolder> {
 
-        private ListItemClickListener listener;
+        private PostsListFragmentListener listener;
 
-        public PostsListAdapter(ListItemClickListener listener) {
+        public PostsListAdapter(PostsListFragmentListener listener) {
             this.listener = listener;
         }
 
@@ -89,7 +94,7 @@ public class PostsListFragment extends Fragment {
                 imageProgressBar.setVisibility(View.VISIBLE);
                 Post post = Model.instance.getPostsData().getValue().get(listIndex);
                 postItemName.setText(post.getName());
-                postImage.setImageResource(R.drawable.add);
+
                 Model.instance.loadImage(post.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
                     @Override
                     public void onComplete(Bitmap pic) {
@@ -126,15 +131,45 @@ public class PostsListFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         postsList.setLayoutManager(layoutManager);
         postsList.setHasFixedSize(true);
-        adapter = new PostsListAdapter(new ListItemClickListener() {
-            @Override
-            public void onListItemClick(int clickedItemIndex) {
-                handleListItemClick(clickedItemIndex);
-            }
-        });
+        adapter = new PostsListAdapter((PostsListFragmentListener) getActivity());
         postsList.setAdapter(adapter);
 
+        addFab = view.findViewById(R.id.postsListScreen__addFab);
+        addFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onAddFabClick();
+            }
+        });
+
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(LogTag.TAG, "*-*-*-* After clicking floating action button, inside onActivityResult() *-*-*-*");
+        if(requestCode == Requests.NEW_POST_REQUEST) {
+            if(resultCode == Results.POST_CREATION_SUCCESS) {
+                Log.d(LogTag.TAG, "*-*-*-* After clicking floating action button, inside onActivityResult() passed the conditions *-*-*-*");
+                ProgressBarManager.showProgressBar();
+                String postName = data.getStringExtra("postName");
+                String postDesc = data.getStringExtra("postDesc");
+                String imageUrl = data.getStringExtra("imageURL");
+                Post post = new Post(postName, postDesc);
+
+                if(imageUrl != null) {
+                    post.setImageUrl(imageUrl);
+                }
+
+                Model.instance.addPostToFirebase(post, new FirebaseModel.OnCreateNewPostListener() {
+                    @Override
+                    public void onComplete(Post post) {
+                        Model.instance.addPostToLocalDB(post, null);
+                        ProgressBarManager.dismissProgressBar();
+                    }
+                });
+            }
+        }
     }
 
     @Override
@@ -165,6 +200,6 @@ public class PostsListFragment extends Fragment {
     }
 
     public void handleListItemClick(int clickedItemIndex) {
-        listener.onListItemSelect(clickedItemIndex);
+        listener.onListItemClick(clickedItemIndex);
     }
 }

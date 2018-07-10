@@ -5,7 +5,7 @@ import android.arch.persistence.room.RoomDatabase;
 
 import com.example.ben.meallennium.model.entities.Post;
 
-@Database(entities = {Post.class}, version = 3)
+@Database(entities = {Post.class}, version = 1)
 public abstract class MillenniumDatabaseRepository extends RoomDatabase {
     public abstract PostDao postDao();
 }

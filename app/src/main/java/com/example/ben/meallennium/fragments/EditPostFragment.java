@@ -121,6 +121,7 @@ public class EditPostFragment extends Fragment {
         Model.instance.loadImage(postToEdit.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
             @Override
             public void onComplete(Bitmap pic) {
+                postImageBitmap = pic;
                 postImage.setImageBitmap(pic);
                 postImageProgressBar.setVisibility(View.GONE);
             }
@@ -152,7 +153,6 @@ public class EditPostFragment extends Fragment {
             public void onClick(View v) {
                 centerProgressBar.setVisibility(View.VISIBLE);
                 Model.instance.saveImage(postImageBitmap, new FirebaseModel.OnSaveImageListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.N)
                     @Override
                     public void onDone(String url) {
                         Post newPost = new Post();
@@ -161,15 +161,7 @@ public class EditPostFragment extends Fragment {
                         newPost.setName(postNameEt.getText().toString());
                         newPost.setId(postToEdit.getId());
 
-                        List<Post> data = Model.instance.getPostsData().getValue();
-                        ListIterator<Post> li = data.listIterator();
-                        while(li.hasNext()) {
-                            if (li.next().getId().equals(newPost.getId())) {
-                                li.set(newPost);
-                                break;
-                            }
-                        }
-                        Model.instance.setPostsData(data);
+                        Model.instance.updatePost(newPost);
                         editListener.onEditDone();
                     }
                 });

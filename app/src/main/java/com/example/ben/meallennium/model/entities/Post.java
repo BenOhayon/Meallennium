@@ -92,10 +92,7 @@ public class Post implements Serializable{
         if(obj instanceof Post) {
             Post post = (Post) obj;
 
-            return this.id.equals(post.id) &&
-                    this.name.equals(post.name) &&
-                    this.description.equals(post.description);
-        } else
-            return false;
+            return this.id.equals(post.id);
+        } else return false;
     }
 }

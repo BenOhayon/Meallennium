@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
+import com.example.ben.meallennium.model.sql.PostAsyncDao;
 import com.example.ben.meallennium.utils.LogTag;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -19,15 +20,48 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 public class FirebaseModel {
+
+    public void updatePost(Post newPost) {
+        createNewPost(newPost, new OnCreateNewPostListener() {
+            @Override
+            public void onComplete(Post post) {
+                Log.d(LogTag.TAG, "Post " + newPost.getId() + " was updated in Firebase.");
+                PostAsyncDao.deletePost(post, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
+                    @Override
+                    public void onComplete(Boolean result) {
+                        if (result) {
+                            Log.d(LogTag.TAG, "Post " + post.getId() + " was deleted from local DB.");
+                            PostAsyncDao.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
+                                @Override
+                                public void onComplete(List<Post> result) {
+                                    Log.d(LogTag.TAG, "Post list after deletion when updating the local DB:");
+                                    for(Post p : result) {
+                                        Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
+                                        Log.d(LogTag.TAG, "===================================");
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
 
     public interface OnUserDeleteListener {
         void onDeletionComplete(User user);
@@ -61,6 +95,8 @@ public class FirebaseModel {
         void onDone(Bitmap pic);
     }
 
+    private static DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+    private static ValueEventListener valueEventListener;
     private FirebaseAuth auth;
     private User signedInUser;
 
@@ -189,18 +225,60 @@ public class FirebaseModel {
     }
 
     public void fetchAllPosts(final OnFetchAllPostsListener listener) {
-        PostFirebase.fetchAllPosts(listener);
+        DatabaseReference postsRef = dbRef.child("Posts");
+        valueEventListener = postsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Post> posts = new LinkedList<>();
+                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Post post = postSnapshot.getValue(Post.class);
+                    posts.add(post);
+                }
+
+                Log.d(LogTag.TAG, "onDataChange() called on firebase");
+                listener.onComplete(posts);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(LogTag.TAG, "onCancelled() called in firebase");
+                listener.onComplete(null);
+            }
+        });
     }
 
-    public void cancelFetchingData() {
-        PostFirebase.cancelFetchingData();
+    public static void cancelFetchingData() {
+        DatabaseReference ref = dbRef.child("Posts");
+        ref.removeEventListener(valueEventListener);
     }
 
-    public void deletePost(Post post, final OnDeletePostListener listener) {
-        PostFirebase.deletePost(post, listener);
+    public static void deletePost(Post post, final FirebaseModel.OnDeletePostListener listener) {
+        Log.d(LogTag.TAG,post.getId() );
+        DatabaseReference postRef = dbRef.child("Posts").child(post.getId());
+        postRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(LogTag.TAG, "A post " + post.getId() + " was deleted from Firebase successfully");
+                listener.onComplete();
+            }
+        });
     }
 
-    public void createNewPost(Post post, final OnCreateNewPostListener listener) {
-        PostFirebase.createNewPost(post, listener);
+    public void createNewPost(Post post, final FirebaseModel.OnCreateNewPostListener listener) {
+        Log.d(LogTag.TAG, "creating a new post in FirebaseModel." + post.getId());
+        DatabaseReference postsRef = dbRef.child("Posts").child(post.getId());
+        postsRef.setValue(post).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(LogTag.TAG, "Create new post success!");
+                listener.onComplete(post);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(LogTag.TAG, "Creating a new post in Firebase failed.");
+                listener.onComplete(null);
+            }
+        });
     }
 }

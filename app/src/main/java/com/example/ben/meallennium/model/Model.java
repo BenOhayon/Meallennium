@@ -25,12 +25,16 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-// TODO Eliav comments:
 // TODO Add ViewModels to every activity and fragment.
 // TODO Improve the design in the app screens.
-// TODO Add Edit Post option: make sure to validate the edit operation in local DB and Firebase.
+// TODO Add another post list for displaying your posts using tabs/sections.
+// TODO Add Edit Post option: make sure to validate the edit operation in local DB and Firebase, There's still a problem making the actual changes in Post list.
 
 public class Model {
+
+    public void updatePost(Post newPost) {
+        firebaseModel.updatePost(newPost);
+    }
 
     public interface OnOperationCompleteListener {
         void onComplete();
@@ -63,9 +67,19 @@ public class Model {
                         public void onComplete(List<Post> postsFromFirebase) {
                             Log.d(LogTag.TAG, "Updating the posts list from Firebase");
                             Log.d(LogTag.TAG, "Got " + postsFromFirebase.size() + " posts from Firebase");
+                            Log.d(LogTag.TAG, "\n\nThe posts got from Firebase are:\n");
+                            for(Post p : postsFromFirebase) {
+                                Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
+                                Log.d(LogTag.TAG, "===================================");
+                            }
                             List<Post> temp = new LinkedList<>();
                             temp.addAll(postsFromDB);
                             List<Post> deltaPostsList = getDeltaList(postsFromDB, postsFromFirebase);
+                            Log.d(LogTag.TAG, "\n\nThe posts in the Delta are:\n");
+                            for(Post p : deltaPostsList) {
+                                Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
+                                Log.d(LogTag.TAG, "===================================");
+                            }
                             Log.d(LogTag.TAG, "deltaList size: " + deltaPostsList.size());
                             if (deltaPostsList.size() != 0) {
                                 temp.addAll(deltaPostsList);
@@ -221,21 +235,23 @@ public class Model {
         firebaseModel.createNewPost(post, listener);
     }
 
-    public MutableLiveData<List<Post>> getPostsData() {
+    public LiveData<List<Post>> getPostsData() {
         return postsData;
     }
 
-    public void setPostsData(List<Post> data) {
-        getPostsData().setValue(data);
-    }
-
     private List<Post> getDeltaList(List<Post> source, List<Post> getDeltaFrom) {
+        Log.d(LogTag.TAG, "Inside getDeltaList():");
         List<Post> deltaList = new LinkedList<>();
         for(Post p : getDeltaFrom) {
+            Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
+            Log.d(LogTag.TAG, "DB has post: " + (source.contains(p)));
             if(!source.contains(p)) {
                 deltaList.add(p);
+                Log.d(LogTag.TAG, "The post bellow was added to the delta:");
+                Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
             }
         }
+        Log.d(LogTag.TAG, "returning from getDeltaList()");
         return deltaList;
     }
 }
