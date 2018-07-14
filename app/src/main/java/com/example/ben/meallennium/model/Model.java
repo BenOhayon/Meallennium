@@ -5,7 +5,6 @@ import android.arch.lifecycle.MutableLiveData;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.webkit.URLUtil;
 
@@ -24,14 +23,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 // TODO Improve the design in the app screens.
-// TODO Make a conditional button displaying in edit post screen.
 // TODO Figure out if CardView can help improving design.
 
 public class Model {
