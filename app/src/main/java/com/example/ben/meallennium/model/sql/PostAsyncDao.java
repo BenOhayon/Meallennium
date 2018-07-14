@@ -8,6 +8,27 @@ import java.util.List;
 
 public class PostAsyncDao {
 
+    public static void getPostsByPublisher(String publisher, PostAsyncDaoListener<List<Post>> listener) {
+        class MyAsyncTask extends AsyncTask<String, String, List<Post>> {
+            @Override
+            protected List<Post> doInBackground(String... strings) {
+                return MillenniumDatabase.db.postDao().getPostsByPublisher(strings[0]);
+            }
+
+            @Override
+            protected void onPostExecute(List<Post> posts) {
+                super.onPostExecute(posts);
+
+                if(listener != null) {
+                    listener.onComplete(posts);
+                }
+            }
+        }
+
+        MyAsyncTask task = new MyAsyncTask();
+        task.execute(publisher);
+    }
+
     public static void addPosts(List<Post> posts, PostAsyncDaoListener<Boolean> listener) {
         class MyAsyncTask extends AsyncTask<List<Post>, String, Boolean> {
             @Override

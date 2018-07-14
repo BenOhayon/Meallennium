@@ -28,15 +28,19 @@ public class Post implements Serializable{
     @ColumnInfo(name = "Image URL")
     private String imageUrl;
 
+    @ColumnInfo(name = "Publisher")
+    private String publisher;
+
     @Ignore
     public Post() {}
 
     @Ignore
-    public Post(String name, String description) {
-        this(name, description, null);
+    public Post(String publisher, String name, String description) {
+        this(publisher, name, description, null);
     }
 
-    public Post(String name, String description, String imageUrl) {
+    public Post(String publisher, String name, String description, String imageUrl) {
+        this.publisher = publisher;
         this.id = generatePostId();
         this.name = name;
         this. description = description;
@@ -67,6 +71,14 @@ public class Post implements Serializable{
         return description;
     }
 
+    public String getPublisher() {
+        return this.publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
     public void setId(@NonNull String id) {
         this.id = id;
     }
@@ -92,7 +104,10 @@ public class Post implements Serializable{
         if(obj instanceof Post) {
             Post post = (Post) obj;
 
-            return this.id.equals(post.id);
+            return this.id.equals(post.id) &&
+                    this.name.equals(post.name) &&
+                    this.description.equals(post.description) &&
+                    ((this.imageUrl == null && post.imageUrl == null) || (this.imageUrl != null && post.imageUrl != null && this.imageUrl.equals(post.imageUrl)));
         } else return false;
     }
 }

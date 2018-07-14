@@ -8,4 +8,7 @@
     <string name="appVersion">1.0</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="tab_text_1">All Posts</string>
+    <string name="tab_text_2">My Posts</string>
 </resources>

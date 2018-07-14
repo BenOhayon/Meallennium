@@ -36,33 +36,6 @@ import java.util.List;
 
 public class FirebaseModel {
 
-    public void updatePost(Post newPost) {
-        createNewPost(newPost, new OnCreateNewPostListener() {
-            @Override
-            public void onComplete(Post post) {
-                Log.d(LogTag.TAG, "Post " + newPost.getId() + " was updated in Firebase.");
-                PostAsyncDao.deletePost(post, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
-                    @Override
-                    public void onComplete(Boolean result) {
-                        if (result) {
-                            Log.d(LogTag.TAG, "Post " + post.getId() + " was deleted from local DB.");
-                            PostAsyncDao.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
-                                @Override
-                                public void onComplete(List<Post> result) {
-                                    Log.d(LogTag.TAG, "Post list after deletion when updating the local DB:");
-                                    for(Post p : result) {
-                                        Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
-                                        Log.d(LogTag.TAG, "===================================");
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
-            }
-        });
-    }
-
     public interface OnUserDeleteListener {
         void onDeletionComplete(User user);
     }
@@ -134,6 +107,35 @@ public class FirebaseModel {
                 } else {
                     Log.d(LogTag.TAG, "Download Uri task failed");
                 }
+            }
+        });
+    }
+
+    public void updatePost(String publisher, Post newPost) {
+        createNewPost(publisher, newPost, new OnCreateNewPostListener() {
+            @Override
+            public void onComplete(Post post) {
+                Log.d(LogTag.TAG, "Post " + newPost.getId() + " was updated in Firebase.");
+                PostAsyncDao.deletePost(post, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
+                    @Override
+                    public void onComplete(Boolean result) {
+                        if (result) {
+                            Log.d(LogTag.TAG, "Post " + post.getId() + " was deleted from local DB.");
+                            PostAsyncDao.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
+                                @Override
+                                public void onComplete(List<Post> result) {
+                                    Log.d(LogTag.TAG, "Post list after deletion when updating the local DB:");
+                                    for(Post p : result) {
+                                        Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
+                                        Log.d(LogTag.TAG, "===================================");
+                                    }
+                                }
+                            });
+                        } else {
+                            Log.d(LogTag.TAG, "!!!!!!!Something went wrong with the deletion from the local DB.!!!!!!!!");
+                        }
+                    }
+                });
             }
         });
     }
@@ -230,9 +232,11 @@ public class FirebaseModel {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Post> posts = new LinkedList<>();
-                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    Post post = postSnapshot.getValue(Post.class);
-                    posts.add(post);
+                for(DataSnapshot idSnapshot : dataSnapshot.getChildren()) {
+                    for (DataSnapshot postSnapshot : idSnapshot.getChildren()) {
+                        Post post = postSnapshot.getValue(Post.class);
+                        posts.add(post);
+                    }
                 }
 
                 Log.d(LogTag.TAG, "onDataChange() called on firebase");
@@ -247,12 +251,12 @@ public class FirebaseModel {
         });
     }
 
-    public static void cancelFetchingData() {
+    public void cancelFetchingData() {
         DatabaseReference ref = dbRef.child("Posts");
         ref.removeEventListener(valueEventListener);
     }
 
-    public static void deletePost(Post post, final FirebaseModel.OnDeletePostListener listener) {
+    public void deletePost(Post post, final FirebaseModel.OnDeletePostListener listener) {
         Log.d(LogTag.TAG,post.getId() );
         DatabaseReference postRef = dbRef.child("Posts").child(post.getId());
         postRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -264,9 +268,9 @@ public class FirebaseModel {
         });
     }
 
-    public void createNewPost(Post post, final FirebaseModel.OnCreateNewPostListener listener) {
+    public void createNewPost(String publisher, Post post, final FirebaseModel.OnCreateNewPostListener listener) {
         Log.d(LogTag.TAG, "creating a new post in FirebaseModel." + post.getId());
-        DatabaseReference postsRef = dbRef.child("Posts").child(post.getId());
+        DatabaseReference postsRef = dbRef.child("Posts").child(publisher).child(post.getId());
         postsRef.setValue(post).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {

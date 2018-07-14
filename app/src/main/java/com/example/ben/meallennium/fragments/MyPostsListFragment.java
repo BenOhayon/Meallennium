@@ -5,11 +5,11 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,7 +26,7 @@ import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.model.sql.PostAsyncDao;
-import com.example.ben.meallennium.model.viewmodels.PostsListViewModel;
+import com.example.ben.meallennium.model.viewmodels.MyPostsListViewModel;
 import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 import com.example.ben.meallennium.utils.Requests;
@@ -36,24 +36,24 @@ import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class PostsListFragment extends Fragment {
+public class MyPostsListFragment extends Fragment {
 
-    public interface PostsListFragmentListener {
-        void onListItemClick(int clickedItemIndex);
+    public interface MyPostsListFragmentListener {
+        void onMyListItemClick(int clickedItemIndex);
         void onAddFabClick();
     }
 
-    private PostsListViewModel postsViewModel;
-    private PostsListAdapter adapter;
+    private MyPostsListViewModel postsViewModel;
+    private MyPostsListAdapter adapter;
     private FloatingActionButton addFab;
 
-    private PostsListFragmentListener listener;
+    private MyPostsListFragmentListener listener;
 
-    class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostViewHolder> {
+    class MyPostsListAdapter extends RecyclerView.Adapter<MyPostsListAdapter.PostViewHolder> {
 
-        private PostsListFragmentListener listener;
+        private MyPostsListFragmentListener listener;
 
-        public PostsListAdapter(PostsListFragmentListener listener) {
+        public MyPostsListAdapter(MyPostsListFragmentListener listener) {
             this.listener = listener;
         }
 
@@ -63,17 +63,17 @@ public class PostsListFragment extends Fragment {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.posts_list_item,
                     parent, false);
 
-            return new PostViewHolder(view);
+            return new MyPostsListAdapter.PostViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull PostsListAdapter.PostViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
             holder.bind(position);
         }
 
         @Override
         public int getItemCount() {
-            return Model.instance.getPostsData().getValue().size();
+            return Model.instance.getMyPostsData().getValue().size();
         }
 
 
@@ -93,10 +93,10 @@ public class PostsListFragment extends Fragment {
 
             private void bind(int listIndex) {
                 imageProgressBar.setVisibility(View.VISIBLE);
-                Post post = Model.instance.getPostsData().getValue().get(listIndex);
+                Post post = Model.instance.getMyPostsData().getValue().get(listIndex);
                 postItemName.setText(post.getName());
 
-                if(post.getImageUrl() != null) {
+                if (post.getImageUrl() != null) {
                     Model.instance.loadImage(post.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
                         @Override
                         public void onComplete(Bitmap pic) {
@@ -118,12 +118,12 @@ public class PostsListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 int clickedPosition = getAdapterPosition();
-                listener.onListItemClick(clickedPosition);
+                listener.onMyListItemClick(clickedPosition);
             }
         }
     }
 
-    public PostsListFragment() {}
+    public MyPostsListFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -139,7 +139,7 @@ public class PostsListFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         postsList.setLayoutManager(layoutManager);
         postsList.setHasFixedSize(true);
-        adapter = new PostsListAdapter((PostsListFragmentListener) getActivity());
+        adapter = new MyPostsListAdapter((MyPostsListFragmentListener) getActivity());
         postsList.setAdapter(adapter);
 
 //        addFab = view.findViewById(R.id.postsListScreen__addFab);
@@ -161,13 +161,13 @@ public class PostsListFragment extends Fragment {
 //                String postName = data.getStringExtra("postName");
 //                String postDesc = data.getStringExtra("postDesc");
 //                String imageUrl = data.getStringExtra("imageURL");
-//                Post post = new Post(/*PostsListActivity.SIGNED_IN_USERNAME,*/ postName, postDesc);
+//                Post post = new Post(PostsListActivity.SIGNED_IN_USERNAME, postName, postDesc);
 //
 //                if(imageUrl != null) {
 //                    post.setImageUrl(imageUrl);
 //                }
 //
-//                Model.instance.addPost(PostsListActivity.SIGNED_IN_USERNAME,
+//                Model.instance.addPost(getActivity().getSharedPreferences("SP", MODE_PRIVATE).getString("userName", "default name"),
 //                        post, new FirebaseModel.OnCreateNewPostListener() {
 //                            @Override
 //                            public void onComplete(Post post) {
@@ -180,7 +180,7 @@ public class PostsListFragment extends Fragment {
 //                            }
 //                        });
 //
-////                Model.instance.addPostToFirebase(post, new FirebaseModel.OnCreateNewPostListener() {
+////                Model.instance.addPostToFirebase(getActivity().getSharedPreferences("SP", MODE_PRIVATE).getString("userName", "default name"), post, new FirebaseModel.OnCreateNewPostListener() {
 ////                    @Override
 ////                    public void onComplete(Post post) {
 ////                        Model.instance.addPost(post, null);
@@ -195,15 +195,15 @@ public class PostsListFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if(context instanceof PostsListFragmentListener) {
-            listener = (PostsListFragmentListener ) context;
+        if(context instanceof MyPostsListFragmentListener) {
+            listener = (MyPostsListFragmentListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement MyPostsListFragmentListener");
         }
 
-        postsViewModel = ViewModelProviders.of(this).get(PostsListViewModel.class);
-        postsViewModel.getPostsData().observe(this, new Observer<List<Post>>() {
+        postsViewModel = ViewModelProviders.of(this).get(MyPostsListViewModel.class);
+        postsViewModel.getMyPostsData().observe(this, new Observer<List<Post>>() {
             @Override
             public void onChanged(@Nullable List<Post> posts) {
                 adapter.notifyDataSetChanged();
@@ -217,8 +217,4 @@ public class PostsListFragment extends Fragment {
         super.onDetach();
         listener = null;
     }
-
-//    public void handleListItemClick(int clickedItemIndex) {
-//        listener.onListItemClick(clickedItemIndex);
-//    }
 }

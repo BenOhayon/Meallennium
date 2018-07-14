@@ -123,8 +123,11 @@ public class AddNewPostActivity extends AppCompatActivity {
             }
         }
 
-        // TODO Add rotation functionality
-        postImage.setImageBitmap(bitmapImage);
+        if (bitmapImage != null) {
+            postImage.setImageBitmap(bitmapImage);
+        } else {
+            postImage.setImageResource(R.drawable.about);
+        }
     }
 
     private Bitmap getRotatedImage(String imageFileUrl) {

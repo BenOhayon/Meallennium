@@ -22,9 +22,9 @@ import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 
 public class PostDetailsActivity extends AppCompatActivity implements
-        PostDetailsFragment.OnDeleteButtonClicked,
         EditPostFragment.OnCancelButtonClicked,
-        EditPostFragment.OnEditCompleteListener{
+        EditPostFragment.OnEditCompleteListener,
+        PostDetailsFragment.OnPostDetailsEventsListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +64,11 @@ public class PostDetailsActivity extends AppCompatActivity implements
 
     @Override
     public void onDelete() {
+        finish();
+    }
+
+    @Override
+    public void onBack() {
         finish();
     }
 }

@@ -17,18 +17,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/postsListScreen__addFab"
-        android:layout_width="wrap_content"
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:id="@+id/postsListScreen__addFab"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_marginBottom="36dp"-->
+        <!--android:layout_marginEnd="36dp"-->
+        <!--android:clickable="true"-->
+        <!--app:srcCompat="@drawable/add_white_48" />-->
+
+    <TextView
+        android:id="@+id/postsListScreen__startMessage"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="36dp"
-        android:layout_marginEnd="36dp"
-        android:clickable="true"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/colorPrimary"
-        app:fabSize="normal" />
+        android:layout_centerInParent="true"
+        android:text="Share your experiences with others by clicking (+)"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:visibility="invisible" />
 
 
 </RelativeLayout>

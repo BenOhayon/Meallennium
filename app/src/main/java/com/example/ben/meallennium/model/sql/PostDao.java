@@ -16,6 +16,9 @@ public interface PostDao {
     @Query("select * from Post")
     List<Post> getAllPosts();
 
+    @Query("select * from Post where Publisher = :publisher")
+    List<Post> getPostsByPublisher(String publisher);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void addPost(Post...post);
 

@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.example.ben.meallennium.R;
+import com.example.ben.meallennium.activities.PostsListActivity;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
@@ -121,8 +122,12 @@ public class EditPostFragment extends Fragment {
         Model.instance.loadImage(postToEdit.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
             @Override
             public void onComplete(Bitmap pic) {
-                postImageBitmap = pic;
-                postImage.setImageBitmap(pic);
+                if (pic != null) {
+                    postImageBitmap = pic;
+                    postImage.setImageBitmap(pic);
+                } else {
+                    postImage.setImageResource(R.drawable.about);
+                }
                 postImageProgressBar.setVisibility(View.GONE);
             }
         });
@@ -161,7 +166,7 @@ public class EditPostFragment extends Fragment {
                         newPost.setName(postNameEt.getText().toString());
                         newPost.setId(postToEdit.getId());
 
-                        Model.instance.updatePost(newPost);
+                        Model.instance.updatePost(PostsListActivity.SIGNED_IN_USERNAME, newPost);
                         editListener.onEditDone();
                     }
                 });
