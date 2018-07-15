@@ -7,8 +7,8 @@
         android:id="@+id/actionMenu__search"
         android:title="search menu"
         android:icon="@drawable/search"
-        app:showAsAction="ifRoom"
-        app:actionViewClass="android.widget.SearchView" />
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
 
     <item android:title="Menu"
         app:showAsAction="always"

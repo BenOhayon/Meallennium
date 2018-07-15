@@ -4,125 +4,119 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:background="@mipmap/fresh_plated_salad_925x">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         tools:context=".fragments.AddNewPostFragment">
 
 
-        <TextView
-            android:id="@+id/createPostScreen__title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:fontFamily="cursive"
-            android:text="Create a Post"
-            android:textAlignment="center"
-            android:textColor="@android:color/black"
-            android:textSize="36sp"
-            android:textStyle="bold"
+        <ImageView
+            android:id="@+id/createPostScreen__imageSelect"
+            android:layout_width="0dp"
+            android:layout_height="135dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/about"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/createPostScreen__imageSelect"
-            android:layout_width="141dp"
-            android:layout_height="148dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:src="@drawable/about"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/createPostScreen__title" />
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/textInputLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/createPostScreen__postNameEt">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/createPostScreen__postDescTextArea"
-                style="@android:style/Animation.Activity"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:hint="write about dishes you liked, sales and recommendations."
-                android:textAlignment="viewStart" />
-        </android.support.design.widget.TextInputLayout>
-
         <EditText
             android:id="@+id/createPostScreen__postNameEt"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="32dp"
+            android:ems="10"
+            android:hint="Give a name to the post"
+            android:inputType="textPersonName"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/createPostScreen__pickFromGalleryButton" />
+
+        <Button
+            android:id="@+id/createPostScreen__postButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/oval_style"
+            android:drawableStart="@drawable/new_post_48"
+            android:text="Post"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/createPostScreen__cancelButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/createPostScreen__cancelButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/oval_style"
+            android:drawableStart="@drawable/x_sign"
+            android:text="cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/createPostScreen__postButton" />
+
+        <Button
+            android:id="@+id/createPostScreen__takePictureButton"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/oval_style"
+            android:drawableStart="@drawable/camera_48"
+            android:text="Take a Picture"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/createPostScreen__pickFromGalleryButton"
+            app:layout_constraintTop_toBottomOf="@+id/createPostScreen__imageSelect" />
+
+        <Button
+            android:id="@+id/createPostScreen__pickFromGalleryButton"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/oval_style"
+            android:drawableStart="@drawable/gallery_48"
+            android:text="Pick from gallery"
+            app:layout_constraintEnd_toStartOf="@+id/createPostScreen__takePictureButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/createPostScreen__imageSelect" />
+
+        <EditText
+            android:id="@+id/createPostScreen__postDescTextArea"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="32dp"
             android:ems="10"
-            android:hint="Give a name to the post"
-            android:inputType="textPersonName"
+            android:hint="Write about dishes, sales and recommendations"
+            android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/createPostScreen__imageSelect" />
-
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="352dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="16dp"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <Button
-                android:id="@+id/createPostScreen__postButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Post" />
-
-            <Button
-                android:id="@+id/createPostScreen__cancelButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="cancel" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/createPostScreen__takePictureButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:text="Take a Picture"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/createPostScreen__imageSelect"
-            app:layout_constraintTop_toBottomOf="@+id/createPostScreen__title" />
-
-        <Button
-            android:id="@+id/createPostScreen__pickFromGalleryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            android:text="Pick from gallery"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/createPostScreen__imageSelect"
-            app:layout_constraintTop_toBottomOf="@+id/createPostScreen__takePictureButton" />
+            app:layout_constraintTop_toBottomOf="@+id/createPostScreen__postNameEt" />
 
     </android.support.constraint.ConstraintLayout>
 

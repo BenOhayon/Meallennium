@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/postDetails__postImage"
-        android:layout_width="157dp"
-        android:layout_height="135dp"
+        android:layout_width="295dp"
+        android:layout_height="200dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
@@ -39,48 +39,51 @@
         android:layout_marginTop="8dp"
         android:textAlignment="viewStart"
         android:textSize="22sp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
+        app:layout_constraintBottom_toTopOf="@+id/postDetails__editButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/postDetails__postNameTv"
-        app:layout_constraintVertical_bias="0.26" />
+        app:layout_constraintVertical_bias="0.65" />
 
-    <LinearLayout
-        android:id="@+id/linearLayout5"
-        android:layout_width="368dp"
+    <Button
+        android:id="@+id/postDetails__editButton"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="15dp"
+        android:layout_marginBottom="23dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:text="EDIT"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/postDetails__deleteButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/oval_style"
+        android:drawableStart="@drawable/edit_48"/>
+
+    <Button
+        android:id="@+id/postDetails__deleteButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="23dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:text="DELETE"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <Button
-            android:id="@+id/postDetails__editButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="EDIT"
-            android:visibility="invisible" />
-
-        <Button
-            android:id="@+id/postDetails__deleteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="DELETE"
-            android:visibility="invisible" />
-    </LinearLayout>
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/postDetails__editButton"
+        android:background="@drawable/oval_style"
+        android:drawableStart="@drawable/delete_40"/>
 
     <ProgressBar
         android:id="@+id/postDetails__imageProgressBar"
         style="?android:attr/progressBarStyle"
-        android:layout_width="77dp"
-        android:layout_height="67dp"
+        android:layout_width="105dp"
+        android:layout_height="90dp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:visibility="invisible"
@@ -89,7 +92,7 @@
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.086" />
+        app:layout_constraintVertical_bias="0.135" />
 
     <ProgressBar
         android:id="@+id/postDetails__centerProgressBar"
@@ -108,7 +111,7 @@
     <Button
         android:id="@+id/postDetails__backButton"
         android:layout_width="136dp"
-        android:layout_height="46dp"
+        android:layout_height="0dp"
         android:layout_marginBottom="23dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -116,5 +119,7 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/oval_style" />
+
 </android.support.constraint.ConstraintLayout>

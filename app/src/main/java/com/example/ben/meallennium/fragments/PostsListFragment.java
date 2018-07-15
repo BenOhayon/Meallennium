@@ -78,7 +78,7 @@ public class PostsListFragment extends Fragment {
 
 
         public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-            TextView postItemName;
+            TextView postItemName, publisherName;
             ImageView postImage;
             ProgressBar imageProgressBar;
 
@@ -87,6 +87,7 @@ public class PostsListFragment extends Fragment {
 
                 postItemName = itemView.findViewById(R.id.postItem_name);
                 postImage = itemView.findViewById(R.id.postItem_image);
+                publisherName = itemView.findViewById(R.id.postItem_publisherName);
                 imageProgressBar = itemView.findViewById(R.id.postItem_progressBar);
                 itemView.setOnClickListener(this);
             }
@@ -95,6 +96,7 @@ public class PostsListFragment extends Fragment {
                 imageProgressBar.setVisibility(View.VISIBLE);
                 Post post = Model.instance.getPostsData().getValue().get(listIndex);
                 postItemName.setText(post.getName());
+                publisherName.setText("Post by: " + post.getPublisher());
 
                 if(post.getImageUrl() != null) {
                     Model.instance.loadImage(post.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
@@ -142,54 +144,8 @@ public class PostsListFragment extends Fragment {
         adapter = new PostsListAdapter((PostsListFragmentListener) getActivity());
         postsList.setAdapter(adapter);
 
-//        addFab = view.findViewById(R.id.postsListScreen__addFab);
-//        addFab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                listener.onAddFabClick();
-//            }
-//        });
-
         return view;
     }
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if(requestCode == Requests.NEW_POST_REQUEST) {
-//            if(resultCode == Results.POST_CREATION_SUCCESS) {
-//                ProgressBarManager.showProgressBar();
-//                String postName = data.getStringExtra("postName");
-//                String postDesc = data.getStringExtra("postDesc");
-//                String imageUrl = data.getStringExtra("imageURL");
-//                Post post = new Post(/*PostsListActivity.SIGNED_IN_USERNAME,*/ postName, postDesc);
-//
-//                if(imageUrl != null) {
-//                    post.setImageUrl(imageUrl);
-//                }
-//
-//                Model.instance.addPost(PostsListActivity.SIGNED_IN_USERNAME,
-//                        post, new FirebaseModel.OnCreateNewPostListener() {
-//                            @Override
-//                            public void onComplete(Post post) {
-//                                ProgressBarManager.dismissProgressBar();
-//                            }
-//                        }, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
-//                            @Override
-//                            public void onComplete(Boolean result) {
-//                                Log.d(LogTag.TAG, "New post " + post.getId() + " was added to local DB.");
-//                            }
-//                        });
-//
-////                Model.instance.addPostToFirebase(post, new FirebaseModel.OnCreateNewPostListener() {
-////                    @Override
-////                    public void onComplete(Post post) {
-////                        Model.instance.addPost(post, null);
-////                        ProgressBarManager.dismissProgressBar();
-////                    }
-////                });
-//            }
-//        }
-//    }
 
     @Override
     public void onAttach(Context context) {

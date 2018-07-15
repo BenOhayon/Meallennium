@@ -1,6 +1,7 @@
 package com.example.ben.meallennium.activities;
 
 import android.app.SearchManager;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,8 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.SearchView;
-import android.widget.TextView;
+import android.support.v7.widget.SearchView;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.dialogs.DeleteAccountConfirmationDialog;
@@ -42,6 +42,8 @@ public class PostsListActivity extends AppCompatActivity implements
         MyPostsListFragment.MyPostsListFragmentListener {
 
     public static String SIGNED_IN_USERNAME;
+    private ViewPager viewPager;
+    private List<Post> originalAllPosts, originalMyPosts;
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -51,11 +53,7 @@ public class PostsListActivity extends AppCompatActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-
             if(position == 0) {
-                Log.d(LogTag.TAG, "Selecting tab #0");
                 return new PostsListFragment();
             }
 
@@ -95,7 +93,7 @@ public class PostsListActivity extends AppCompatActivity implements
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        ViewPager viewPager = findViewById(R.id.fragment_posts_list_container);
+        viewPager = findViewById(R.id.fragment_posts_list_container);
         viewPager.setAdapter(sectionsPagerAdapter);
 
         TabLayout tabLayout = findViewById(R.id.tabs);
@@ -160,19 +158,6 @@ public class PostsListActivity extends AppCompatActivity implements
                                 Log.d(LogTag.TAG, "New post " + post.getId() + " was added to local DB.");
                             }
                         });
-
-//                Model.instance.addPostToFirebase(post, new FirebaseModel.OnCreateNewPostListener() {
-//                    @Override
-//                    public void onComplete(Post post) {
-//                        Model.instance.addPost(post, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
-//                            @Override
-//                            public void onComplete(Boolean result) {
-//                                Log.d(LogTag.TAG, "New post " + post.getId() + " was added to local DB.");
-//                            }
-//                        });
-//                        ProgressBarManager.dismissProgressBar();
-//                    }
-//                });
             }
         }
     }
@@ -181,12 +166,41 @@ public class PostsListActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_posts_list, menu);
 
+//        MenuItem menuItem = menu.findItem(R.id.actionMenu__search);
+//        SearchView searchView = (SearchView) menuItem.getActionView();
+//        searchView.setOnQueryTextListener(this);
+//        searchView.setQueryHint("Type a dish or restaurant");
+//        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+//            @Override
+//            public boolean onClose() {
+//                Model.instance.getAllPostsFromLocalDB(new FirebaseModel.OnFetchAllPostsListener() {
+//                    @Override
+//                    public void onComplete(List<Post> posts) {
+//                        ((MutableLiveData<List<Post>>) Model.instance.getPostsData()).setValue(posts);
+//                    }
+//                });
+//                return true;
+//            }
+//        });
+
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.actionMenu__search).getActionView();
         searchView.setQueryHint("Type a dish or restaurant");
         if(searchManager != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         }
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                MutableLiveData<List<Post>> allPostsLiveData = (MutableLiveData<List<Post>>) Model.instance.getPostsData();
+                MutableLiveData<List<Post>> myPostsLiveData = (MutableLiveData<List<Post>>) Model.instance.getMyPostsData();
+
+                allPostsLiveData.setValue(originalAllPosts);
+                myPostsLiveData.setValue(originalMyPosts);
+                return true;
+            }
+        });
 
         return true;
     }
@@ -195,17 +209,19 @@ public class PostsListActivity extends AppCompatActivity implements
     //   LISTENER METHODS
     // --------------------
 
+
+    /*
+     * For the use of PostListAdapter
+     */
     @Override
     public void onListItemClick(int clickedItemIndex) {
         Post selectedPost = Model.instance.getPostsData().getValue().get(clickedItemIndex);
-
         moveToPostDetailsActivity(selectedPost);
     }
 
     @Override
     public void onMyListItemClick(int clickedItemIndex) {
         Post selectedPost = Model.instance.getMyPostsData().getValue().get(clickedItemIndex);
-
         moveToPostDetailsActivity(selectedPost);
     }
 
@@ -229,14 +245,31 @@ public class PostsListActivity extends AppCompatActivity implements
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             // TODO enter the search logic here.
+            String userInput = query.toLowerCase();
 
-            List<Post> postsToFilter = new LinkedList<>();
-            for(Post post : Model.instance.getPostsData().getValue()) {
-                if(post.getName().contains(query)) {
-                    postsToFilter.add(post);
-                    Log.d("buildTest", "Post name: " + post.getName() + ", Post Description: " + post.getDescription());
-                }
-            }
+//            MutableLiveData<List<Post>> allPostsLiveData = (MutableLiveData<List<Post>>) Model.instance.getPostsData();
+//            MutableLiveData<List<Post>> myPostsLiveData = (MutableLiveData<List<Post>>) Model.instance.getMyPostsData();
+//
+//            originalAllPosts = allPostsLiveData.getValue();
+//            originalMyPosts = myPostsLiveData.getValue();
+//
+//            List<Post> newAllPosts = new LinkedList<>();
+//            List<Post> newMyPosts = new LinkedList<>();
+//
+//            for(Post post : originalAllPosts) {
+//                if(post.getName().contains(userInput) || post.getPublisher().contains(userInput)) {
+//                    newAllPosts.add(post);
+//                }
+//            }
+//
+//            for(Post post : originalMyPosts) {
+//                if(post.getName().contains(userInput) || post.getPublisher().contains(userInput)) {
+//                    newMyPosts.add(post);
+//                }
+//            }
+//
+//            allPostsLiveData.setValue(newAllPosts);
+//            myPostsLiveData.setValue(newMyPosts);
         }
     }
 

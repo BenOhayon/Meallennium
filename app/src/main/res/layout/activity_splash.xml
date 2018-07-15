@@ -11,7 +11,7 @@
         android:id="@+id/splashScreen__appIcon"
         android:layout_width="278dp"
         android:layout_height="275dp"
-        android:layout_marginTop="42dp"
+        android:layout_marginTop="65dp"
         android:src="@mipmap/food"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

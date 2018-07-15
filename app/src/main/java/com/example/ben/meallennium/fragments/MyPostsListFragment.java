@@ -142,54 +142,8 @@ public class MyPostsListFragment extends Fragment {
         adapter = new MyPostsListAdapter((MyPostsListFragmentListener) getActivity());
         postsList.setAdapter(adapter);
 
-//        addFab = view.findViewById(R.id.postsListScreen__addFab);
-//        addFab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                listener.onAddFabClick();
-//            }
-//        });
-
         return view;
     }
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if(requestCode == Requests.NEW_POST_REQUEST) {
-//            if(resultCode == Results.POST_CREATION_SUCCESS) {
-//                ProgressBarManager.showProgressBar();
-//                String postName = data.getStringExtra("postName");
-//                String postDesc = data.getStringExtra("postDesc");
-//                String imageUrl = data.getStringExtra("imageURL");
-//                Post post = new Post(PostsListActivity.SIGNED_IN_USERNAME, postName, postDesc);
-//
-//                if(imageUrl != null) {
-//                    post.setImageUrl(imageUrl);
-//                }
-//
-//                Model.instance.addPost(getActivity().getSharedPreferences("SP", MODE_PRIVATE).getString("userName", "default name"),
-//                        post, new FirebaseModel.OnCreateNewPostListener() {
-//                            @Override
-//                            public void onComplete(Post post) {
-//                                ProgressBarManager.dismissProgressBar();
-//                            }
-//                        }, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
-//                            @Override
-//                            public void onComplete(Boolean result) {
-//                                Log.d(LogTag.TAG, "New post " + post.getId() + " was added to local DB.");
-//                            }
-//                        });
-//
-////                Model.instance.addPostToFirebase(getActivity().getSharedPreferences("SP", MODE_PRIVATE).getString("userName", "default name"), post, new FirebaseModel.OnCreateNewPostListener() {
-////                    @Override
-////                    public void onComplete(Post post) {
-////                        Model.instance.addPost(post, null);
-////                        ProgressBarManager.dismissProgressBar();
-////                    }
-////                });
-//            }
-//        }
-//    }
 
     @Override
     public void onAttach(Context context) {

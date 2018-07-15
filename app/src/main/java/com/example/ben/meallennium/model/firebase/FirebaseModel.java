@@ -78,37 +78,41 @@ public class FirebaseModel {
     }
 
     public void saveImage(Bitmap image, final OnSaveImageListener listener) {
-        Date d = new Date();
-        String name = "image-"+ d.getTime();
-        StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
-                .child("images").child(name);
+        if (image != null) {
+            Date d = new Date();
+            String name = "image-"+ d.getTime();
+            StorageReference imagesRef = FirebaseStorage.getInstance().getReference()
+                    .child("images").child(name);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] data = baos.toByteArray();
 
-        UploadTask uploadTask = imagesRef.putBytes(data);
-        uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-            @Override
-            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                if(!task.isSuccessful()){
-                    throw task.getException();
+            UploadTask uploadTask = imagesRef.putBytes(data);
+            uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if(!task.isSuccessful()){
+                        throw task.getException();
+                    }
+
+                    return imagesRef.getDownloadUrl();
                 }
-
-                return imagesRef.getDownloadUrl();
-            }
-        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                if(task.isSuccessful()) {
-                    Uri downloadUri = task.getResult();
-                    Log.d(LogTag.TAG, "Download Uri task success, download Uri: " + downloadUri);
-                    listener.onDone(downloadUri.toString());
-                } else {
-                    Log.d(LogTag.TAG, "Download Uri task failed");
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if(task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        Log.d(LogTag.TAG, "Download Uri task success, download Uri: " + downloadUri);
+                        listener.onDone(downloadUri.toString());
+                    } else {
+                        Log.d(LogTag.TAG, "Download Uri task failed");
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            listener.onDone(null);
+        }
     }
 
     public void updatePost(String publisher, Post newPost) {
@@ -224,6 +228,29 @@ public class FirebaseModel {
 
     public void signOutCurrentUser() {
         auth.signOut();
+    }
+
+    public void fetchPostsByPublisher(String publisher, OnFetchAllPostsListener listener) {
+        DatabaseReference postsRef = dbRef.child("Posts").child(publisher);
+        valueEventListener = postsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Post> posts = new LinkedList<>();
+                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Post post = postSnapshot.getValue(Post.class);
+                    posts.add(post);
+                }
+
+                Log.d(LogTag.TAG, "onDataChange() called on firebase");
+                listener.onComplete(posts);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(LogTag.TAG, "onCancelled() called in firebase");
+                listener.onComplete(null);
+            }
+        });
     }
 
     public void fetchAllPosts(final OnFetchAllPostsListener listener) {

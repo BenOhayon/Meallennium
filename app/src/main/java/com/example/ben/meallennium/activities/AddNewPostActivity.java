@@ -7,6 +7,7 @@ import android.media.ExifInterface;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.TextInputEditText;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,13 +44,18 @@ public class AddNewPostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_new_post);
 
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         postImage = findViewById(R.id.createPostScreen__imageSelect);
         Button postButton = findViewById(R.id.createPostScreen__postButton);
         Button cancelButton = findViewById(R.id.createPostScreen__cancelButton);
         Button takePictureButton = findViewById(R.id.createPostScreen__takePictureButton);
         Button pickGalleryButton = findViewById(R.id.createPostScreen__pickFromGalleryButton);
         EditText postNameEt = findViewById(R.id.createPostScreen__postNameEt);
-        TextInputEditText postDescEt = findViewById(R.id.createPostScreen__postDescTextArea);
+        EditText postDescEt = findViewById(R.id.createPostScreen__postDescTextArea);
         ProgressBar loadingProgressBar = findViewById(R.id.createPostScreen__progressBar);
         ProgressBarManager.bindProgressBar(loadingProgressBar);
 
@@ -102,6 +108,12 @@ public class AddNewPostActivity extends AppCompatActivity {
         cancelButton.setOnClickListener((View v) -> {
             finish();
         });
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 
     @Override

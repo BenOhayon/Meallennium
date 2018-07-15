@@ -48,8 +48,7 @@ public class EditPostFragment extends Fragment {
     private ImageView postImage;
     private ProgressBar postImageProgressBar, centerProgressBar;
     private Button takePictureButton, pickFromGalleryButton, OKButton, cancelButton;
-    private EditText postNameEt;
-    private TextInputEditText postDescEt;
+    private EditText postNameEt, postDescEt;
     private Bitmap postImageBitmap;
 
     private OnCancelButtonClicked cancelListener;
@@ -160,11 +159,15 @@ public class EditPostFragment extends Fragment {
                 Model.instance.saveImage(postImageBitmap, new FirebaseModel.OnSaveImageListener() {
                     @Override
                     public void onDone(String url) {
-                        Post newPost = new Post();
-                        newPost.setImageUrl(url);
-                        newPost.setDescription(postDescEt.getText().toString());
-                        newPost.setName(postNameEt.getText().toString());
+                        Post newPost = new Post(PostsListActivity.SIGNED_IN_USERNAME,
+                                postNameEt.getText().toString(),
+                                postDescEt.getText().toString());
+
                         newPost.setId(postToEdit.getId());
+
+                        if(url != null) {
+                            newPost.setImageUrl(url);
+                        }
 
                         Model.instance.updatePost(PostsListActivity.SIGNED_IN_USERNAME, newPost);
                         editListener.onEditDone();

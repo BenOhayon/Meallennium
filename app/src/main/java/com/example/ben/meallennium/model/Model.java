@@ -26,10 +26,20 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-// TODO Improve the design in the app screens.
-// TODO Figure out if CardView can help improving design.
+// TODO Add search functionality.
+// TODO Add a message to be displayed when there's no posts in the list.
+// TODO Consider put the menu items as a navigation drawer items (??)
 
 public class Model {
+
+    public void getAllPostsFromLocalDB(FirebaseModel.OnFetchAllPostsListener listener) {
+        PostAsyncDao.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
+            @Override
+            public void onComplete(List<Post> result) {
+                listener.onComplete(result);
+            }
+        });
+    }
 
     public interface OnOperationCompleteListener {
         void onComplete();
@@ -56,15 +66,25 @@ public class Model {
                     new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
                         @Override
                         public void onComplete(List<Post> result) {
-                            // TODO Understand how DAO queries work.
-                            Log.d(LogTag.TAG, "Posts loaded from local DB. Inside onActive()");
-                            for(Post p : result) {
-                                Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
-                                Log.d(LogTag.TAG, "===================================");
+                            if (result.size() != 0) {
+                                Log.d(LogTag.TAG, "Posts loaded from local DB. Inside onActive()");
+                                for(Post p : result) {
+                                    Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
+                                    Log.d(LogTag.TAG, "===================================");
+                                }
+                                Log.d(LogTag.TAG, "Post list loaded from DB size: " + result.size());
+                                setValue(result);
+                                Log.d(LogTag.TAG, "My Posts were successfully loaded from the local DB");
+                            } else {
+                                firebaseModel.fetchPostsByPublisher(PostsListActivity.SIGNED_IN_USERNAME, new FirebaseModel.OnFetchAllPostsListener() {
+                                    @Override
+                                    public void onComplete(List<Post> posts) {
+                                        if(posts != null) {
+                                            setValue(posts);
+                                        }
+                                    }
+                                });
                             }
-                            Log.d(LogTag.TAG, "Post list loaded from DB size: " + result.size());
-                            setValue(result);
-                            Log.d(LogTag.TAG, "My Posts were successfully loaded from the local DB");
                         }
                     });
         }

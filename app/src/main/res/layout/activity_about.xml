@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.AboutFragment">
+    android:background="@mipmap/fresh_plated_salad_925x">
 
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="237dp"
+        android:layout_width="0dp"
         android:layout_height="203dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="24dp"
         android:src="@mipmap/food"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:text="Version: 1.0"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -51,13 +51,14 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:lineSpacingExtra="0sp"
+        android:layout_marginTop="24dp"
+        android:lineSpacingExtra="1sp"
         android:text="Enough of disappointing nights! Improve your nights with recommended restaurants shared by other dinners. Share your own experiences with other dinners. For all restaurant owners: help us make the dishes of today the dishes of the millennium!"
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView10" />
 
@@ -65,11 +66,11 @@
         android:id="@+id/aboutScreen__OKButton"
         android:layout_width="189dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/oval_style"
+        android:drawableStart="@drawable/v_sign"
         android:text="OK"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView13" />
+        app:layout_constraintStart_toStartOf="parent" />
 </android.support.constraint.ConstraintLayout>

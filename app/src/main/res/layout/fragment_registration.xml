@@ -115,7 +115,7 @@
             android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:background="@drawable/oval_style"
-            android:drawableStart="@mipmap/v_sign"
+            android:drawableStart="@drawable/v_sign"
             android:text="Register" />
 
         <Button
@@ -126,7 +126,7 @@
             android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:background="@drawable/oval_style"
-            android:drawableStart="@mipmap/x_sign"
+            android:drawableStart="@drawable/x_sign"
             android:text="Cancel" />
     </LinearLayout>
 

@@ -28,7 +28,7 @@
             android:layout_marginRight="10dp"
             android:layout_weight="1.0"
             android:background="@drawable/oval_style"
-            android:drawableStart="@mipmap/registration_btn_icon"
+            android:drawableStart="@drawable/registration_btn_icon"
             android:text="Registration"
             android:textAlignment="center" />
 
@@ -40,7 +40,7 @@
             android:layout_marginRight="10dp"
             android:layout_weight="1.0"
             android:background="@drawable/oval_style"
-            android:drawableStart="@mipmap/login_btn_icon"
+            android:drawableStart="@drawable/login_btn_icon"
             android:text="Login" />
     </LinearLayout>
 
