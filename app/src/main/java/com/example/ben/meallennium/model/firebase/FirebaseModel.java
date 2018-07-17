@@ -283,9 +283,9 @@ public class FirebaseModel {
         ref.removeEventListener(valueEventListener);
     }
 
-    public void deletePost(Post post, final FirebaseModel.OnDeletePostListener listener) {
+    public void deletePost(String publisher, Post post, final FirebaseModel.OnDeletePostListener listener) {
         Log.d(LogTag.TAG,post.getId() );
-        DatabaseReference postRef = dbRef.child("Posts").child(post.getId());
+        DatabaseReference postRef = dbRef.child("Posts").child(publisher).child(post.getId());
         postRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {

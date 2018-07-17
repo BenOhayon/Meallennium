@@ -29,6 +29,7 @@ import java.util.List;
 // TODO Add search functionality.
 // TODO Add a message to be displayed when there's no posts in the list.
 // TODO Consider put the menu items as a navigation drawer items (??)
+// TODO Move the username string from PostListActivity to the Model.
 
 public class Model {
 
@@ -186,7 +187,7 @@ public class Model {
         PostAsyncDao.deletePost(post, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
             @Override
             public void onComplete(Boolean result) {
-                firebaseModel.deletePost(post, new FirebaseModel.OnDeletePostListener() {
+                firebaseModel.deletePost(PostsListActivity.SIGNED_IN_USERNAME, post, new FirebaseModel.OnDeletePostListener() {
                     @Override
                     public void onComplete() {
                         Log.d(LogTag.TAG, "A post " + post.getId() + " was deleted from local DB successfully");

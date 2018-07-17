@@ -13,6 +13,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
+import com.example.ben.meallennium.dialogs.DeleteAccountConfirmationDialog;
+import com.example.ben.meallennium.dialogs.DeletePostConfirmDialog;
 import com.example.ben.meallennium.fragments.EditPostFragment;
 import com.example.ben.meallennium.fragments.PostDetailsFragment;
 import com.example.ben.meallennium.model.Model;
@@ -24,7 +26,8 @@ import com.example.ben.meallennium.utils.ProgressBarManager;
 public class PostDetailsActivity extends AppCompatActivity implements
         EditPostFragment.OnCancelButtonClicked,
         EditPostFragment.OnEditCompleteListener,
-        PostDetailsFragment.OnPostDetailsEventsListener{
+        PostDetailsFragment.OnPostDetailsEventsListener,
+        DeletePostConfirmDialog.DeletePostConfirmDialogListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +53,11 @@ public class PostDetailsActivity extends AppCompatActivity implements
     public boolean onSupportNavigateUp() {
         finish();
         return true;
+    }
+
+    @Override
+    public void onYesClickedOnDeletePostDialog() {
+        finish();
     }
 
     @Override

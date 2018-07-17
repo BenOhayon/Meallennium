@@ -21,6 +21,7 @@ import android.support.v7.widget.SearchView;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.dialogs.DeleteAccountConfirmationDialog;
+import com.example.ben.meallennium.dialogs.DeletePostConfirmDialog;
 import com.example.ben.meallennium.dialogs.LogoutConfirmationDialog;
 import com.example.ben.meallennium.fragments.MyPostsListFragment;
 import com.example.ben.meallennium.fragments.PostsListFragment;
@@ -39,11 +40,13 @@ import java.util.List;
 
 public class PostsListActivity extends AppCompatActivity implements
         PostsListFragment.PostsListFragmentListener,
-        MyPostsListFragment.MyPostsListFragmentListener {
+        MyPostsListFragment.MyPostsListFragmentListener,
+        DeleteAccountConfirmationDialog.DeleteAccountConfirmationDialogListener,
+        LogoutConfirmationDialog.LogoutConfirmationDialogListener {
 
     public static String SIGNED_IN_USERNAME;
     private ViewPager viewPager;
-    private List<Post> originalAllPosts, originalMyPosts;
+    private List<Post> originalAllPosts, originalMyPosts; // for searching
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -228,6 +231,16 @@ public class PostsListActivity extends AppCompatActivity implements
     @Override
     public void onAddFabClick() {
         moveToAddNewPostActivity();
+    }
+
+    @Override
+    public void onYesClickedOnDeleteAccountDialog() {
+        finish();
+    }
+
+    @Override
+    public void onYesClickedOnLogoutDialog() {
+        finish();
     }
 
     // ----------------------------

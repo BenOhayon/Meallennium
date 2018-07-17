@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.activities.PostsListActivity;
+import com.example.ben.meallennium.dialogs.DeletePostConfirmDialog;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.utils.FragmentTransactions;
@@ -78,6 +79,7 @@ public class PostDetailsFragment extends Fragment {
         imageProgressBar = view.findViewById(R.id.postDetails__imageProgressBar);
         imageProgressBar.setVisibility(View.VISIBLE);
         centerProgressBar = view.findViewById(R.id.postDetails__centerProgressBar);
+        ProgressBarManager.bindProgressBar(centerProgressBar);
 
         Bundle bundle = getArguments();
         post = (Post)bundle.getSerializable("Post");
@@ -105,13 +107,11 @@ public class PostDetailsFragment extends Fragment {
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    centerProgressBar.setVisibility(View.VISIBLE);
-                    Model.instance.deletePost(post, new Model.OnOperationCompleteListener() {
-                        @Override
-                        public void onComplete() {
-                            listener.onDelete();
-                        }
-                    });
+                    DeletePostConfirmDialog dialog = new DeletePostConfirmDialog();
+                    Bundle postToDeleteBundle = new Bundle();
+                    postToDeleteBundle.putSerializable("PostToDelete", post);
+                    dialog.setArguments(postToDeleteBundle);
+                    dialog.show(getActivity().getSupportFragmentManager(), "TAG");
                 }
             });
         } else {
@@ -126,7 +126,6 @@ public class PostDetailsFragment extends Fragment {
             });
         }
 
-        ProgressBarManager.showProgressBar();
         Model.instance.loadImage(post.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
             @Override
             public void onComplete(Bitmap pic) {

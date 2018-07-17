@@ -11,9 +11,16 @@ import com.example.ben.meallennium.model.Model;
 
 public class LogoutConfirmationDialog extends DialogFragment {
 
+    public interface LogoutConfirmationDialogListener {
+        void onYesClickedOnLogoutDialog();
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        LogoutConfirmationDialogListener listener =
+                (LogoutConfirmationDialogListener) getActivity();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Are you sure you want to logout?")
@@ -21,7 +28,7 @@ public class LogoutConfirmationDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Model.instance.signOutCurrentUserFromFirebase();
-                        getActivity().finish();
+                        listener.onYesClickedOnLogoutDialog();
                     }
                 })
                 .setPositiveButton("No", new DialogInterface.OnClickListener() {

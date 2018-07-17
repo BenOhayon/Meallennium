@@ -11,12 +11,19 @@ import android.support.v4.app.DialogFragment;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
-import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
 public class DeleteAccountConfirmationDialog extends DialogFragment {
+
+    public interface DeleteAccountConfirmationDialogListener {
+        void onYesClickedOnDeleteAccountDialog();
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+        DeleteAccountConfirmationDialogListener listener =
+                (DeleteAccountConfirmationDialogListener) getActivity();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Are you sure you want to delete the account?")
@@ -27,9 +34,10 @@ public class DeleteAccountConfirmationDialog extends DialogFragment {
                             @Override
                             public void onDeletionComplete(User user) {
                                 Model.instance.setSignedInUserInFirebase(null);
+                                listener.onYesClickedOnDeleteAccountDialog();
+                                dismiss();
                             }
                         });
-                        getActivity().finish();
                     }
                 })
                 .setPositiveButton("No", new DialogInterface.OnClickListener() {
