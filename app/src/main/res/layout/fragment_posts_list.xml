@@ -24,8 +24,7 @@
         android:layout_centerInParent="true"
         android:text="Share your experiences with others by clicking (+)"
         android:textAlignment="center"
-        android:textSize="14sp"
-        android:visibility="invisible" />
+        android:textSize="14sp"/>
 
 
 </RelativeLayout>

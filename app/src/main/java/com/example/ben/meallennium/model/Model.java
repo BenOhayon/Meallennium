@@ -26,21 +26,11 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-// TODO Add search functionality.
-// TODO Add a message to be displayed when there's no posts in the list.
+// TODO Add search functionality. (ask Eliav)
+// TODO Add a message to be displayed when there's no posts in the list. (ask Eliav)
 // TODO Consider put the menu items as a navigation drawer items (??)
-// TODO Move the username string from PostListActivity to the Model.
 
 public class Model {
-
-    public void getAllPostsFromLocalDB(FirebaseModel.OnFetchAllPostsListener listener) {
-        PostAsyncDao.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
-            @Override
-            public void onComplete(List<Post> result) {
-                listener.onComplete(result);
-            }
-        });
-    }
 
     public interface OnOperationCompleteListener {
         void onComplete();
@@ -55,6 +45,8 @@ public class Model {
     private PostsListLiveData postsData;
     private MyPostsListLiveData myPostsData;
 
+    private static String SIGNED_IN_USERNAME;
+
     public class MyPostsListLiveData extends MutableLiveData<List<Post>> {
         public MyPostsListLiveData() {
             setValue(new LinkedList<>());
@@ -63,21 +55,14 @@ public class Model {
         @Override
         protected void onActive() {
             super.onActive();
-            PostAsyncDao.getPostsByPublisher(PostsListActivity.SIGNED_IN_USERNAME,
+            PostAsyncDao.getPostsByPublisher(SIGNED_IN_USERNAME,
                     new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
                         @Override
                         public void onComplete(List<Post> result) {
                             if (result.size() != 0) {
-                                Log.d(LogTag.TAG, "Posts loaded from local DB. Inside onActive()");
-                                for(Post p : result) {
-                                    Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
-                                    Log.d(LogTag.TAG, "===================================");
-                                }
-                                Log.d(LogTag.TAG, "Post list loaded from DB size: " + result.size());
                                 setValue(result);
-                                Log.d(LogTag.TAG, "My Posts were successfully loaded from the local DB");
                             } else {
-                                firebaseModel.fetchPostsByPublisher(PostsListActivity.SIGNED_IN_USERNAME, new FirebaseModel.OnFetchAllPostsListener() {
+                                firebaseModel.fetchPostsByPublisher(SIGNED_IN_USERNAME, new FirebaseModel.OnFetchAllPostsListener() {
                                     @Override
                                     public void onComplete(List<Post> posts) {
                                         if(posts != null) {
@@ -103,33 +88,13 @@ public class Model {
             PostAsyncDao.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
                 @Override
                 public void onComplete(List<Post> postsFromDB) {
-                    Log.d(LogTag.TAG, "Got " + postsFromDB.size() + " posts from local DB");
-                    Log.d(LogTag.TAG, "The posts gor from DB are:\n");
-                    for(Post p: postsFromDB) {
-                        Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
-                        Log.d(LogTag.TAG, "===================================");
-                    }
-                    Log.d(LogTag.TAG, "\n\nSetting value of posts list\n\n");
                     setValue(postsFromDB);
                     firebaseModel.fetchAllPosts(new FirebaseModel.OnFetchAllPostsListener() {
                         @Override
                         public void onComplete(List<Post> postsFromFirebase) {
-                            Log.d(LogTag.TAG, "Updating the posts list from Firebase");
-                            Log.d(LogTag.TAG, "Got " + postsFromFirebase.size() + " posts from Firebase");
-                            Log.d(LogTag.TAG, "\n\nThe posts got from Firebase are:\n");
-                            for(Post p : postsFromFirebase) {
-                                Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
-                                Log.d(LogTag.TAG, "===================================");
-                            }
                             List<Post> temp = new LinkedList<>();
                             temp.addAll(postsFromDB);
                             List<Post> deltaPostsList = getDeltaList(postsFromDB, postsFromFirebase);
-                            Log.d(LogTag.TAG, "\n\n\nThe posts in the Delta are:\n");
-                            for(Post p : deltaPostsList) {
-                                Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
-                                Log.d(LogTag.TAG, "===================================");
-                            }
-                            Log.d(LogTag.TAG, "deltaList size: " + deltaPostsList.size());
                             if (deltaPostsList.size() != 0) {
                                 for (Post p : deltaPostsList) {
                                     Post postById = getPostFromListById(temp, p.getId());
@@ -179,6 +144,16 @@ public class Model {
         postsData = new PostsListLiveData();
     }
 
+    public static void setSignedInUser(String username) {
+        if (SIGNED_IN_USERNAME == null) {
+            SIGNED_IN_USERNAME = username;
+        }
+    }
+
+    public static String getSignedInUser() {
+        return SIGNED_IN_USERNAME;
+    }
+
     public void updatePost(String publisher, Post newPost) {
         firebaseModel.updatePost(publisher, newPost);
     }
@@ -187,7 +162,7 @@ public class Model {
         PostAsyncDao.deletePost(post, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
             @Override
             public void onComplete(Boolean result) {
-                firebaseModel.deletePost(PostsListActivity.SIGNED_IN_USERNAME, post, new FirebaseModel.OnDeletePostListener() {
+                firebaseModel.deletePost(SIGNED_IN_USERNAME, post, new FirebaseModel.OnDeletePostListener() {
                     @Override
                     public void onComplete() {
                         Log.d(LogTag.TAG, "A post " + post.getId() + " was deleted from local DB successfully");
@@ -262,7 +237,7 @@ public class Model {
             imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.close();
 
-            //addPicureToGallery(imageFile);
+            //addPictureToGallery(imageFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -276,6 +251,15 @@ public class Model {
                         PostAsyncDao.PostAsyncDaoListener<Boolean> DBListener) {
         addPostToFirebase(publisher, post, firebaseListener);
         PostAsyncDao.addPost(post, DBListener);
+    }
+
+    public void getAllPostsFromLocalDB(FirebaseModel.OnFetchAllPostsListener listener) {
+        PostAsyncDao.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
+            @Override
+            public void onComplete(List<Post> result) {
+                listener.onComplete(result);
+            }
+        });
     }
 
     public void addUserToFirebase(User user, final FirebaseModel.OnCreateNewUserListener listener) {
@@ -315,18 +299,12 @@ public class Model {
     }
 
     private List<Post> getDeltaList(List<Post> source, List<Post> getDeltaFrom) {
-        Log.d(LogTag.TAG, "\nInside getDeltaList():");
         List<Post> deltaList = new LinkedList<>();
         for(Post p : getDeltaFrom) {
-            Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
-            Log.d(LogTag.TAG, "DB has post: " + (source.contains(p)));
             if(!source.contains(p)) {
                 deltaList.add(p);
-                Log.d(LogTag.TAG, "The post bellow was added to the delta:");
-                Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
             }
         }
-        Log.d(LogTag.TAG, "returning from getDeltaList()\n");
         return deltaList;
     }
 

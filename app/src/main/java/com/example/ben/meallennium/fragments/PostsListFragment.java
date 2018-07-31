@@ -3,11 +3,9 @@ package com.example.ben.meallennium.fragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,39 +16,34 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.support.v7.widget.SearchView;
 import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
-import com.example.ben.meallennium.activities.PostsListActivity;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
-import com.example.ben.meallennium.model.firebase.FirebaseModel;
-import com.example.ben.meallennium.model.sql.PostAsyncDao;
 import com.example.ben.meallennium.model.viewmodels.PostsListViewModel;
 import com.example.ben.meallennium.utils.LogTag;
-import com.example.ben.meallennium.utils.ProgressBarManager;
-import com.example.ben.meallennium.utils.Requests;
-import com.example.ben.meallennium.utils.Results;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import static android.content.Context.MODE_PRIVATE;
-
-public class PostsListFragment extends Fragment {
+public class PostsListFragment extends Fragment implements SearchView.OnQueryTextListener{
 
     public interface PostsListFragmentListener {
         void onListItemClick(int clickedItemIndex);
-        void onAddFabClick();
     }
 
     private PostsListViewModel postsViewModel;
     private PostsListAdapter adapter;
-    private FloatingActionButton addFab;
+    private TextView startMessage;
 
     private PostsListFragmentListener listener;
+    private List<Post> allPostsToFilter, myPostsToFilter;
 
     class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostViewHolder> {
 
+        private List<Post> list;
         private PostsListFragmentListener listener;
 
         public PostsListAdapter(PostsListFragmentListener listener) {
@@ -62,7 +55,6 @@ public class PostsListFragment extends Fragment {
         public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.posts_list_item,
                     parent, false);
-
             return new PostViewHolder(view);
         }
 
@@ -73,6 +65,8 @@ public class PostsListFragment extends Fragment {
 
         @Override
         public int getItemCount() {
+            Log.d(LogTag.TAG, "getting the size of Post List...");
+
             return Model.instance.getPostsData().getValue().size();
         }
 
@@ -123,6 +117,12 @@ public class PostsListFragment extends Fragment {
                 listener.onListItemClick(clickedPosition);
             }
         }
+
+        private void updateList(List<Post> newList) {
+            list = new LinkedList<>();
+            list.addAll(newList);
+            notifyDataSetChanged();
+        }
     }
 
     public PostsListFragment() {}
@@ -143,6 +143,7 @@ public class PostsListFragment extends Fragment {
         postsList.setHasFixedSize(true);
         adapter = new PostsListAdapter((PostsListFragmentListener) getActivity());
         postsList.setAdapter(adapter);
+        startMessage = view.findViewById(R.id.postsListScreen__startMessage);
 
         return view;
     }
@@ -163,7 +164,12 @@ public class PostsListFragment extends Fragment {
             @Override
             public void onChanged(@Nullable List<Post> posts) {
                 adapter.notifyDataSetChanged();
-                Log.d("buildTest", "LiveData has updated");
+                Log.d(LogTag.TAG, "LiveData has updated");
+                if(Model.instance.getPostsData().getValue().size() != 0) {
+                    startMessage.setVisibility(View.GONE);
+                } else {
+                    startMessage.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
@@ -174,7 +180,46 @@ public class PostsListFragment extends Fragment {
         listener = null;
     }
 
-//    public void handleListItemClick(int clickedItemIndex) {
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+//        allPostsToFilter = Model.instance.getPostsData().getValue();
+//        //myPostsToFilter = Model.instance.getMyPostsData().getValue();
+//        if(query.equals("")) {
+//            adapter.updateList(allPostsToFilter);
+//            return true;
+//        }
+//
+//        for(Post p : allPostsToFilter) {
+//            if(!(p.getPublisher().contains(query) || p.getName().contains(query))) {
+//                allPostsToFilter.remove(p);
+//            }
+//        }
+//
+//        adapter.updateList(allPostsToFilter);
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+//        allPostsToFilter = Model.instance.getPostsData().getValue();
+//        //myPostsToFilter = Model.instance.getMyPostsData().getValue();
+//        if(newText.equals("")) {
+//            adapter.updateList(allPostsToFilter);
+//            return true;
+//        }
+//
+//        for(Post p : allPostsToFilter) {
+//            if(!(p.getPublisher().contains(newText) || p.getName().contains(newText))) {
+//                allPostsToFilter.remove(p);
+//            }
+//        }
+//
+//        adapter.updateList(allPostsToFilter);
+
+        return false;
+    }
+
+    //    public void handleListItemClick(int clickedItemIndex) {
 //        listener.onListItemClick(clickedItemIndex);
 //    }
 }

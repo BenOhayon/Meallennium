@@ -3,7 +3,6 @@ package com.example.ben.meallennium.fragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,31 +20,24 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
-import com.example.ben.meallennium.activities.PostsListActivity;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
-import com.example.ben.meallennium.model.firebase.FirebaseModel;
-import com.example.ben.meallennium.model.sql.PostAsyncDao;
 import com.example.ben.meallennium.model.viewmodels.MyPostsListViewModel;
 import com.example.ben.meallennium.utils.LogTag;
-import com.example.ben.meallennium.utils.ProgressBarManager;
-import com.example.ben.meallennium.utils.Requests;
-import com.example.ben.meallennium.utils.Results;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class MyPostsListFragment extends Fragment {
 
     public interface MyPostsListFragmentListener {
         void onMyListItemClick(int clickedItemIndex);
-        void onAddFabClick();
     }
 
     private MyPostsListViewModel postsViewModel;
     private MyPostsListAdapter adapter;
-    private FloatingActionButton addFab;
+    private TextView startMessage;
 
     private MyPostsListFragmentListener listener;
 
@@ -73,6 +65,8 @@ public class MyPostsListFragment extends Fragment {
 
         @Override
         public int getItemCount() {
+            Log.d(LogTag.TAG, "getting the size of My Post List...");
+
             return Model.instance.getMyPostsData().getValue().size();
         }
 
@@ -141,6 +135,7 @@ public class MyPostsListFragment extends Fragment {
         postsList.setHasFixedSize(true);
         adapter = new MyPostsListAdapter((MyPostsListFragmentListener) getActivity());
         postsList.setAdapter(adapter);
+        startMessage = view.findViewById(R.id.postsListScreen__startMessage);
 
         return view;
     }
@@ -161,7 +156,13 @@ public class MyPostsListFragment extends Fragment {
             @Override
             public void onChanged(@Nullable List<Post> posts) {
                 adapter.notifyDataSetChanged();
-                Log.d("buildTest", "LiveData has updated");
+                Log.d(LogTag.TAG, "LiveData has updated");
+
+                if(Model.instance.getPostsData().getValue().size() != 0) {
+                    startMessage.setVisibility(View.GONE);
+                } else {
+                    startMessage.setVisibility(View.VISIBLE);
+                }
             }
         });
     }

@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.PostsListActivity"
-    android:background="@mipmap/fresh_plated_salad_925x">
+    android:background="@mipmap/fresh_plated_salad_925x"
+    tools:context=".activities.PostsListActivity">
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tabs"

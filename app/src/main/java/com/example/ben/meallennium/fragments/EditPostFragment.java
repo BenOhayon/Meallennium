@@ -159,7 +159,7 @@ public class EditPostFragment extends Fragment {
                 Model.instance.saveImage(postImageBitmap, new FirebaseModel.OnSaveImageListener() {
                     @Override
                     public void onDone(String url) {
-                        Post newPost = new Post(PostsListActivity.SIGNED_IN_USERNAME,
+                        Post newPost = new Post(Model.getSignedInUser(),
                                 postNameEt.getText().toString(),
                                 postDescEt.getText().toString());
 
@@ -169,7 +169,7 @@ public class EditPostFragment extends Fragment {
                             newPost.setImageUrl(url);
                         }
 
-                        Model.instance.updatePost(PostsListActivity.SIGNED_IN_USERNAME, newPost);
+                        Model.instance.updatePost(Model.getSignedInUser(), newPost);
                         editListener.onEditDone();
                     }
                 });

@@ -86,7 +86,7 @@ public class PostDetailsFragment extends Fragment {
         postNameTv.setText(post.getName());
         postDescTv.setText(post.getDescription());
 
-        if (PostsListActivity.SIGNED_IN_USERNAME.equals(post.getPublisher())) {
+        if (Model.getSignedInUser().equals(post.getPublisher())) {
             editButton = view.findViewById(R.id.postDetails__editButton);
             deleteButton = view.findViewById(R.id.postDetails__deleteButton);
 
