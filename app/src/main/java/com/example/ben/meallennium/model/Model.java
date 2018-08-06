@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+// TODO ask Eliav about fragments anf destroying views.
 // TODO Add search functionality. (ask Eliav)
 // TODO Add a message to be displayed when there's no posts in the list. (ask Eliav)
 // TODO Consider put the menu items as a navigation drawer items (??)

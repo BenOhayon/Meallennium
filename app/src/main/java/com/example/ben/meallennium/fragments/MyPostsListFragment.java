@@ -135,10 +135,19 @@ public class MyPostsListFragment extends Fragment {
         postsList.setHasFixedSize(true);
         adapter = new MyPostsListAdapter((MyPostsListFragmentListener) getActivity());
         postsList.setAdapter(adapter);
-        startMessage = view.findViewById(R.id.postsListScreen__startMessage);
 
         return view;
     }
+
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        if(Model.instance.getPostsData().getValue().size() != 0) {
+//            startMessage.setVisibility(View.GONE);
+//        } else {
+//            startMessage.setVisibility(View.VISIBLE);
+//        }
+//    }
 
     @Override
     public void onAttach(Context context) {
@@ -157,12 +166,6 @@ public class MyPostsListFragment extends Fragment {
             public void onChanged(@Nullable List<Post> posts) {
                 adapter.notifyDataSetChanged();
                 Log.d(LogTag.TAG, "LiveData has updated");
-
-                if(Model.instance.getPostsData().getValue().size() != 0) {
-                    startMessage.setVisibility(View.GONE);
-                } else {
-                    startMessage.setVisibility(View.VISIBLE);
-                }
             }
         });
     }

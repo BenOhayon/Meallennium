@@ -3,6 +3,7 @@ package com.example.ben.meallennium.fragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,24 +15,32 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.support.v7.widget.SearchView;
 import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
+import com.example.ben.meallennium.activities.SearchResultsActivity;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
+import com.example.ben.meallennium.model.sql.PostAsyncDao;
 import com.example.ben.meallennium.model.viewmodels.PostsListViewModel;
 import com.example.ben.meallennium.utils.LogTag;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class PostsListFragment extends Fragment implements SearchView.OnQueryTextListener{
+public class PostsListFragment extends Fragment {
 
     public interface PostsListFragmentListener {
         void onListItemClick(int clickedItemIndex);
+    }
+
+    public interface OnSearchButtonClicked {
+        void onSearchButtonClick(Intent intent);
     }
 
     private PostsListViewModel postsViewModel;
@@ -39,11 +48,10 @@ public class PostsListFragment extends Fragment implements SearchView.OnQueryTex
     private TextView startMessage;
 
     private PostsListFragmentListener listener;
-    private List<Post> allPostsToFilter, myPostsToFilter;
+    private OnSearchButtonClicked searchClickListener;
 
     class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostViewHolder> {
 
-        private List<Post> list;
         private PostsListFragmentListener listener;
 
         public PostsListAdapter(PostsListFragmentListener listener) {
@@ -117,12 +125,6 @@ public class PostsListFragment extends Fragment implements SearchView.OnQueryTex
                 listener.onListItemClick(clickedPosition);
             }
         }
-
-        private void updateList(List<Post> newList) {
-            list = new LinkedList<>();
-            list.addAll(newList);
-            notifyDataSetChanged();
-        }
     }
 
     public PostsListFragment() {}
@@ -143,7 +145,19 @@ public class PostsListFragment extends Fragment implements SearchView.OnQueryTex
         postsList.setHasFixedSize(true);
         adapter = new PostsListAdapter((PostsListFragmentListener) getActivity());
         postsList.setAdapter(adapter);
-        startMessage = view.findViewById(R.id.postsListScreen__startMessage);
+        Button searchButton = view.findViewById(R.id.postsListScreen__searchButton);
+        EditText searchQuery = view.findViewById(R.id.postsListScreen__searchQuery);
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toSearchResults = new Intent(getActivity(), SearchResultsActivity.class);
+                Log.d(LogTag.TAG, "search query: " + searchQuery.getText().toString());
+                toSearchResults.putExtra("query", searchQuery.getText().toString());
+                toSearchResults.putExtra("list", 0);
+                searchClickListener.onSearchButtonClick(toSearchResults);
+            }
+        });
 
         return view;
     }
@@ -156,7 +170,14 @@ public class PostsListFragment extends Fragment implements SearchView.OnQueryTex
             listener = (PostsListFragmentListener ) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement MyPostsListFragmentListener");
+                    + " must implement PostsListFragmentListener");
+        }
+
+        if(context instanceof OnSearchButtonClicked) {
+            searchClickListener = (OnSearchButtonClicked) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnSearchButtonClicked");
         }
 
         postsViewModel = ViewModelProviders.of(this).get(PostsListViewModel.class);
@@ -165,11 +186,11 @@ public class PostsListFragment extends Fragment implements SearchView.OnQueryTex
             public void onChanged(@Nullable List<Post> posts) {
                 adapter.notifyDataSetChanged();
                 Log.d(LogTag.TAG, "LiveData has updated");
-                if(Model.instance.getPostsData().getValue().size() != 0) {
-                    startMessage.setVisibility(View.GONE);
-                } else {
-                    startMessage.setVisibility(View.VISIBLE);
-                }
+//                if(Model.instance.getPostsData().getValue().size() != 0) {
+//                    startMessage.setVisibility(View.GONE);
+//                } else {
+//                    startMessage.setVisibility(View.VISIBLE);
+//                }
             }
         });
     }
@@ -179,47 +200,4 @@ public class PostsListFragment extends Fragment implements SearchView.OnQueryTex
         super.onDetach();
         listener = null;
     }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-//        allPostsToFilter = Model.instance.getPostsData().getValue();
-//        //myPostsToFilter = Model.instance.getMyPostsData().getValue();
-//        if(query.equals("")) {
-//            adapter.updateList(allPostsToFilter);
-//            return true;
-//        }
-//
-//        for(Post p : allPostsToFilter) {
-//            if(!(p.getPublisher().contains(query) || p.getName().contains(query))) {
-//                allPostsToFilter.remove(p);
-//            }
-//        }
-//
-//        adapter.updateList(allPostsToFilter);
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-//        allPostsToFilter = Model.instance.getPostsData().getValue();
-//        //myPostsToFilter = Model.instance.getMyPostsData().getValue();
-//        if(newText.equals("")) {
-//            adapter.updateList(allPostsToFilter);
-//            return true;
-//        }
-//
-//        for(Post p : allPostsToFilter) {
-//            if(!(p.getPublisher().contains(newText) || p.getName().contains(newText))) {
-//                allPostsToFilter.remove(p);
-//            }
-//        }
-//
-//        adapter.updateList(allPostsToFilter);
-
-        return false;
-    }
-
-    //    public void handleListItemClick(int clickedItemIndex) {
-//        listener.onListItemClick(clickedItemIndex);
-//    }
 }

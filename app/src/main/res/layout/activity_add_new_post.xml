@@ -4,8 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
-    android:layout_width="match_parent"
-    android:background="@mipmap/fresh_plated_salad_925x">
+    android:layout_width="match_parent">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -52,7 +51,7 @@
             android:layout_weight="1"
             android:background="@drawable/oval_style"
             android:drawableStart="@drawable/new_post_48"
-            android:text="Post"
+            android:text="PUBLISH"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/createPostScreen__cancelButton"
             app:layout_constraintHorizontal_bias="0.5"

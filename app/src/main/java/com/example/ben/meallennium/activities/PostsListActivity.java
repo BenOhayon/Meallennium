@@ -43,11 +43,11 @@ public class PostsListActivity extends AppCompatActivity implements
         PostsListFragment.PostsListFragmentListener,
         MyPostsListFragment.MyPostsListFragmentListener,
         DeleteAccountConfirmationDialog.DeleteAccountConfirmationDialogListener,
-        LogoutConfirmationDialog.LogoutConfirmationDialogListener {
+        LogoutConfirmationDialog.LogoutConfirmationDialogListener,
+        PostsListFragment.OnSearchButtonClicked {
 
     private ViewPager viewPager;
     private PostsListFragment postsListFragment;
-    private List<Post> originalAllPosts, originalMyPosts; // for searching
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -173,7 +173,6 @@ public class PostsListActivity extends AppCompatActivity implements
         }
 
         Log.d(LogTag.TAG, "postsListFragment = " + postsListFragment);
-        searchView.setOnQueryTextListener(postsListFragment);
 
         return true;
     }
@@ -196,6 +195,11 @@ public class PostsListActivity extends AppCompatActivity implements
     public void onMyListItemClick(int clickedItemIndex) {
         Post selectedPost = Model.instance.getMyPostsData().getValue().get(clickedItemIndex);
         moveToPostDetailsActivity(selectedPost);
+    }
+
+    @Override
+    public void onSearchButtonClick(Intent intent) {
+        startActivity(intent);
     }
 
     @Override
