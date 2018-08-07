@@ -15,41 +15,27 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
-import com.example.ben.meallennium.activities.PostsListActivity;
 import com.example.ben.meallennium.dialogs.DeletePostConfirmDialog;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.utils.FragmentTransactions;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 
+import java.util.Objects;
+
 public class PostDetailsFragment extends Fragment {
 
-//    public interface OnDeleteButtonClicked {
-//        void onDelete();
-//    }
-//
-//    public interface OnBackButtonClicked {
-//        void onBack();
-//    }
-
     public interface OnPostDetailsEventsListener {
-        void onDelete();
         void onBack();
     }
 
     private ImageView postImage;
-    private TextView postNameTv;
-    private TextView postDescTv;
-    private Button editButton, deleteButton, backButton;
     private ProgressBar imageProgressBar;
-    private ProgressBar centerProgressBar;
     private Post post;
 
     private OnPostDetailsEventsListener listener;
 
-    public PostDetailsFragment() {
-        // Required empty public constructor
-    }
+    public PostDetailsFragment() {}
 
     @Override
     public void onAttach(Context context) {
@@ -74,68 +60,55 @@ public class PostDetailsFragment extends Fragment {
 
     private void initializeViewElements(View view) {
         postImage = view.findViewById(R.id.postDetails__postImage);
-        postNameTv = view.findViewById(R.id.postDetails__postNameTv);
-        postDescTv = view.findViewById(R.id.postDetails__postDescTv);
+        TextView postNameTv = view.findViewById(R.id.postDetails__postNameTv);
+        TextView postDescTv = view.findViewById(R.id.postDetails__postDescTv);
         imageProgressBar = view.findViewById(R.id.postDetails__imageProgressBar);
         imageProgressBar.setVisibility(View.VISIBLE);
-        centerProgressBar = view.findViewById(R.id.postDetails__centerProgressBar);
+        ProgressBar centerProgressBar = view.findViewById(R.id.postDetails__centerProgressBar);
         ProgressBarManager.bindProgressBar(centerProgressBar);
 
         Bundle bundle = getArguments();
-        post = (Post)bundle.getSerializable("Post");
-        postNameTv.setText(post.getName());
+        post = (Post) Objects.requireNonNull(bundle).getSerializable("Post");
+        postNameTv.setText(Objects.requireNonNull(post).getName());
         postDescTv.setText(post.getDescription());
 
         if (Model.getSignedInUser().equals(post.getPublisher())) {
-            editButton = view.findViewById(R.id.postDetails__editButton);
-            deleteButton = view.findViewById(R.id.postDetails__deleteButton);
+            Button editButton = view.findViewById(R.id.postDetails__editButton);
+            Button deleteButton = view.findViewById(R.id.postDetails__deleteButton);
 
             editButton.setVisibility(View.VISIBLE);
             deleteButton.setVisibility(View.VISIBLE);
 
-            editButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    EditPostFragment editPostFragment = new EditPostFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("postToEdit", post);
-                    editPostFragment.setArguments(bundle);
-                    FragmentTransactions.createAndDisplayFragment((AppCompatActivity)getActivity(), R.id.fragment_post_details_container, editPostFragment, true);
-                }
+            editButton.setOnClickListener((View v) -> {
+                EditPostFragment editPostFragment = new EditPostFragment();
+                Bundle bundle1 = new Bundle();
+                bundle1.putSerializable("postToEdit", post);
+                editPostFragment.setArguments(bundle1);
+                FragmentTransactions.createAndDisplayFragment((AppCompatActivity) Objects.requireNonNull(getActivity()),
+                        R.id.fragment_post_details_container, editPostFragment, true);
             });
 
-            deleteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    DeletePostConfirmDialog dialog = new DeletePostConfirmDialog();
-                    Bundle postToDeleteBundle = new Bundle();
-                    postToDeleteBundle.putSerializable("PostToDelete", post);
-                    dialog.setArguments(postToDeleteBundle);
-                    dialog.show(getActivity().getSupportFragmentManager(), "TAG");
-                }
+            deleteButton.setOnClickListener((View v) -> {
+                DeletePostConfirmDialog dialog = new DeletePostConfirmDialog();
+                Bundle postToDeleteBundle = new Bundle();
+                postToDeleteBundle.putSerializable("PostToDelete", post);
+                dialog.setArguments(postToDeleteBundle);
+                dialog.show(Objects.requireNonNull(getActivity()).getSupportFragmentManager(), "TAG");
             });
         } else {
-            backButton = view.findViewById(R.id.postDetails__backButton);
+            Button backButton = view.findViewById(R.id.postDetails__backButton);
             backButton.setVisibility(View.VISIBLE);
 
-            backButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onBack();
-                }
-            });
+            backButton.setOnClickListener((View v) -> listener.onBack());
         }
 
-        Model.instance.loadImage(post.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
-            @Override
-            public void onComplete(Bitmap pic) {
-                if (pic != null) {
-                    postImage.setImageBitmap(pic);
-                } else {
-                    postImage.setImageResource(R.drawable.about);
-                }
-                imageProgressBar.setVisibility(View.GONE);
+        Model.instance.loadImage(post.getImageUrl(), (Bitmap pic) -> {
+            if (pic != null) {
+                postImage.setImageBitmap(pic);
+            } else {
+                postImage.setImageResource(R.drawable.about);
             }
+            imageProgressBar.setVisibility(View.GONE);
         });
     }
 

@@ -37,7 +37,7 @@ public class SearchResultsActivity extends AppCompatActivity implements PostsLis
 
         private PostsListFragment.PostsListFragmentListener listener;
 
-        public SearchResultsPostsListAdapter(PostsListFragment.PostsListFragmentListener listener) {
+        SearchResultsPostsListAdapter(PostsListFragment.PostsListFragmentListener listener) {
             this.listener = listener;
         }
 
@@ -79,20 +79,17 @@ public class SearchResultsActivity extends AppCompatActivity implements PostsLis
                 imageProgressBar.setVisibility(View.VISIBLE);
                 Post post = searchResults.get(listIndex);
                 postItemName.setText(post.getName());
-                publisherName.setText("Post by: " + post.getPublisher());
+                publisherName.setText(getResources().getString(R.string.PostByPublisherName, Model.getSignedInUser()));
 
                 if(post.getImageUrl() != null) {
-                    Model.instance.loadImage(post.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
-                        @Override
-                        public void onComplete(Bitmap pic) {
-                            Log.d(LogTag.TAG, "Retrieving picture from local cache");
-                            if (pic != null) {
-                                postImage.setImageBitmap(pic);
-                            } else {
-                                postImage.setImageResource(R.drawable.about);
-                            }
-                            imageProgressBar.setVisibility(View.GONE);
+                    Model.instance.loadImage(post.getImageUrl(), (Bitmap pic) -> {
+                        Log.d(LogTag.TAG, "Retrieving picture from local cache");
+                        if (pic != null) {
+                            postImage.setImageBitmap(pic);
+                        } else {
+                            postImage.setImageResource(R.drawable.about);
                         }
+                        imageProgressBar.setVisibility(View.GONE);
                     });
                 } else {
                     postImage.setImageResource(R.drawable.about);
@@ -113,9 +110,14 @@ public class SearchResultsActivity extends AppCompatActivity implements PostsLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_results);
 
+        Intent fromPostsList = getIntent();
+        String searchQuery = fromPostsList.getStringExtra("query");
+        int requestingList = fromPostsList.getIntExtra("list", -1);
+
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("Results for '" + searchQuery + "'");
         }
 
         RecyclerView searchResultsPostList = findViewById(R.id.searchResultsListScreen__list);
@@ -125,14 +127,9 @@ public class SearchResultsActivity extends AppCompatActivity implements PostsLis
         adapter = new SearchResultsPostsListAdapter(this);
         searchResultsPostList.setAdapter(adapter);
 
-
-        Intent fromPostsList = getIntent();
-        String searchQuery = fromPostsList.getStringExtra("query");
-        int requestingList = fromPostsList.getIntExtra("list", -1);
-        if (requestingList == 0) {
-            PostAsyncDao.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
-                @Override
-                public void onComplete(List<Post> result) {
+        switch(requestingList) {
+            case 0:
+                PostAsyncDao.getAllPosts((List<Post> result) -> {
                     Iterator iter = result.iterator();
                     while(iter.hasNext()) {
                         Post p = (Post)iter.next();
@@ -143,26 +140,27 @@ public class SearchResultsActivity extends AppCompatActivity implements PostsLis
 
                     searchResults.addAll(result);
                     adapter.notifyDataSetChanged();
-                }
-            });
-        } else if(requestingList == 1) {
-            PostAsyncDao.getPostsByPublisher(Model.getSignedInUser(), new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
-                @Override
-                public void onComplete(List<Post> result) {
+                });
+                break;
+
+            case 1:
+                PostAsyncDao.getPostsByPublisher(Model.getSignedInUser(), (List<Post> result) -> {
                     Iterator iter = result.iterator();
                     while(iter.hasNext()) {
                         Post p = (Post)iter.next();
-                        if(!p.getPublisher().startsWith(searchQuery) && !p.getName().startsWith(searchQuery)) {
+                        if(!p.getName().startsWith(searchQuery)) {
                             iter.remove();
                         }
                     }
 
                     searchResults.addAll(result);
                     adapter.notifyDataSetChanged();
-                }
-            });
-        } else {
-            ToastMessageDisplayer.displayToast(this, "Something went wrong with requester list");
+                });
+                break;
+
+            default:
+                ToastMessageDisplayer.displayToast(this, "Something went wrong with requester list");
+                break;
         }
     }
 

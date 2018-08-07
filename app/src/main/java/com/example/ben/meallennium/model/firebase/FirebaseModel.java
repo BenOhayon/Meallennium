@@ -8,11 +8,7 @@ import android.util.Log;
 
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
-import com.example.ben.meallennium.model.sql.PostAsyncDao;
 import com.example.ben.meallennium.utils.LogTag;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -33,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class FirebaseModel {
 
@@ -89,25 +86,19 @@ public class FirebaseModel {
             byte[] data = baos.toByteArray();
 
             UploadTask uploadTask = imagesRef.putBytes(data);
-            uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                @Override
-                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if(!task.isSuccessful()){
-                        throw task.getException();
-                    }
-
-                    return imagesRef.getDownloadUrl();
+            uploadTask.continueWithTask((Task<UploadTask.TaskSnapshot> task) -> {
+                if(!task.isSuccessful()){
+                    throw Objects.requireNonNull(task.getException());
                 }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if(task.isSuccessful()) {
-                        Uri downloadUri = task.getResult();
-                        Log.d(LogTag.TAG, "Download Uri task success, download Uri: " + downloadUri);
-                        listener.onDone(downloadUri.toString());
-                    } else {
-                        Log.d(LogTag.TAG, "Download Uri task failed");
-                    }
+
+                return imagesRef.getDownloadUrl();
+            }).addOnCompleteListener((Task<Uri> task) -> {
+                if(task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    Log.d(LogTag.TAG, "Download Uri task success, download Uri: " + downloadUri);
+                    listener.onDone(downloadUri.toString());
+                } else {
+                    Log.d(LogTag.TAG, "Download Uri task failed");
                 }
             });
         } else {
@@ -115,53 +106,18 @@ public class FirebaseModel {
         }
     }
 
-    public void updatePost(String publisher, Post newPost) {
-        createNewPost(publisher, newPost, new OnCreateNewPostListener() {
-            @Override
-            public void onComplete(Post post) {
-                Log.d(LogTag.TAG, "Post " + newPost.getId() + " was updated in Firebase.");
-                PostAsyncDao.deletePost(post, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
-                    @Override
-                    public void onComplete(Boolean result) {
-                        if (result) {
-                            Log.d(LogTag.TAG, "Post " + post.getId() + " was deleted from local DB.");
-                            PostAsyncDao.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
-                                @Override
-                                public void onComplete(List<Post> result) {
-                                    Log.d(LogTag.TAG, "Post list after deletion when updating the local DB:");
-                                    for(Post p : result) {
-                                        Log.d(LogTag.TAG, "Post ID: " + p.getId() + "\nPost name: " + p.getName() + "\nPost Description: " + p.getDescription() + "\nPost Url: " + p.getImageUrl());
-                                        Log.d(LogTag.TAG, "===================================");
-                                    }
-                                }
-                            });
-                        } else {
-                            Log.d(LogTag.TAG, "!!!!!!!Something went wrong with the deletion from the local DB.!!!!!!!!");
-                        }
-                    }
-                });
-            }
-        });
-    }
-
     public void getImage(String imageUrl, final OnGetImageListener listener) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference httpsReference = storage.getReferenceFromUrl(imageUrl);
         final long ONE_MEGABYTE = 1024 * 1024;
-        httpsReference.getBytes(3* ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap image = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-                Log.d("TAG","get image from firebase success");
-                listener.onDone(image);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(Exception exception) {
-                Log.d("TAG",exception.getMessage());
-                Log.d("TAG","get image from firebase Failed");
-                listener.onDone(null);
-            }
+        httpsReference.getBytes(3* ONE_MEGABYTE).addOnSuccessListener((byte[] bytes) -> {
+            Bitmap image = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+            Log.d("TAG","get image from firebase success");
+            listener.onDone(image);
+        }).addOnFailureListener((Exception exception) -> {
+            Log.d("TAG",exception.getMessage());
+            Log.d("TAG","get image from firebase Failed");
+            listener.onDone(null);
         });
     }
 
@@ -201,21 +157,13 @@ public class FirebaseModel {
         AuthCredential credential = EmailAuthProvider.getCredential(signedInUser.getEmail(), signedInUser.getPassword());
 
         if(user != null) {
-            user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    Log.d(LogTag.TAG, "User re-authenticated.");
-                }
-            });
+            user.reauthenticate(credential).addOnCompleteListener((Task<Void> task) -> Log.d(LogTag.TAG, "User re-authenticated."));
 
-            user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        Log.d(LogTag.TAG, "User account deleted.");
-                        listener.onDeletionComplete(signedInUser);
-                        signedInUser = null;
-                    }
+            user.delete().addOnCompleteListener((Task<Void> task) -> {
+                if (task.isSuccessful()) {
+                    Log.d(LogTag.TAG, "User account deleted.");
+                    DatabaseReference userRef = dbRef.child("Posts").child(signedInUser.getUsername());
+                    userRef.removeValue().addOnSuccessListener((Void aVoid) -> listener.onDeletionComplete(signedInUser));
                 }
             });
         }
@@ -234,7 +182,7 @@ public class FirebaseModel {
         DatabaseReference postsRef = dbRef.child("Posts").child(publisher);
         valueEventListener = postsRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Post> posts = new LinkedList<>();
                 for(DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Post post = postSnapshot.getValue(Post.class);
@@ -257,7 +205,7 @@ public class FirebaseModel {
         DatabaseReference postsRef = dbRef.child("Posts");
         valueEventListener = postsRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Post> posts = new LinkedList<>();
                 for(DataSnapshot idSnapshot : dataSnapshot.getChildren()) {
                     for (DataSnapshot postSnapshot : idSnapshot.getChildren()) {
@@ -286,28 +234,23 @@ public class FirebaseModel {
     public void deletePost(String publisher, Post post, final FirebaseModel.OnDeletePostListener listener) {
         Log.d(LogTag.TAG,post.getId() );
         DatabaseReference postRef = dbRef.child("Posts").child(publisher).child(post.getId());
-        postRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(LogTag.TAG, "A post " + post.getId() + " was deleted from Firebase successfully");
-                listener.onComplete();
-            }
+        postRef.removeValue().addOnSuccessListener((Void aVoid) -> {
+            Log.d(LogTag.TAG, "A post " + post.getId() + " was deleted from Firebase successfully");
+            listener.onComplete();
         });
     }
 
     public void createNewPost(String publisher, Post post, final FirebaseModel.OnCreateNewPostListener listener) {
         Log.d(LogTag.TAG, "creating a new post in FirebaseModel." + post.getId());
         DatabaseReference postsRef = dbRef.child("Posts").child(publisher).child(post.getId());
-        postsRef.setValue(post).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(LogTag.TAG, "Create new post success!");
+        postsRef.setValue(post).addOnSuccessListener((Void aVoid) -> {
+            Log.d(LogTag.TAG, "Create new post success!");
+            if (listener != null) {
                 listener.onComplete(post);
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(LogTag.TAG, "Creating a new post in Firebase failed.");
+        }).addOnFailureListener((Exception e) -> {
+            Log.d(LogTag.TAG, "Creating a new post in Firebase failed.");
+            if (listener != null) {
                 listener.onComplete(null);
             }
         });

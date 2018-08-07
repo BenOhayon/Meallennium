@@ -60,46 +60,40 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
 
     @Override
     public void onRegister(User user) {
-        Model.instance.addUserToFirebase(user, new FirebaseModel.OnCreateNewUserListener() {
-            @Override
-            public void onCreationComplete(User user) {
-                if(user != null) {
-                    Model.instance.setSignedInUserInFirebase(user);
+        Model.instance.addUserToFirebase(user, (User user1) -> {
+            if(user1 != null) {
+                Model.instance.setSignedInUserInFirebase(user1);
 
-                    SharedPreferences.Editor sharedEditor = getSharedPreferences("SP", MODE_PRIVATE).edit();
-                    sharedEditor.putString("userName", user.getUsername());
-                    sharedEditor.commit();
+                SharedPreferences.Editor sharedEditor = getSharedPreferences("SP", MODE_PRIVATE).edit();
+                sharedEditor.putString("userName", user1.getUsername());
+                sharedEditor.apply();
 
-                    ProgressBarManager.dismissProgressBar();
-                    ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, "The user " + user + " signed up!");
-                    moveToPostListActivity();
-                } else {
-                    ProgressBarManager.dismissProgressBar();
-                    ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, "Failed to sign up user");
-                }
+                ProgressBarManager.dismissProgressBar();
+                ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, user1.getUsername() + " signed up!");
+                moveToPostListActivity();
+            } else {
+                ProgressBarManager.dismissProgressBar();
+                ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, "Failed to sign up user");
             }
         });
     }
 
     @Override
     public void onLogin(User user) {
-        Model.instance.signInUserToFirebase(user, new FirebaseModel.OnSignInUserListener() {
-            @Override
-            public void onSignInComplete(User user) {
-                if(user != null) {
-                    Model.instance.setSignedInUserInFirebase(user);
+        Model.instance.signInUserToFirebase(user, (User user1) -> {
+            if(user1 != null) {
+                Model.instance.setSignedInUserInFirebase(user1);
 
-                    SharedPreferences.Editor sharedEditor = getSharedPreferences("SP", MODE_PRIVATE).edit();
-                    sharedEditor.putString("userName", user.getUsername());
-                    sharedEditor.commit();
+                SharedPreferences.Editor sharedEditor = getSharedPreferences("SP", MODE_PRIVATE).edit();
+                sharedEditor.putString("userName", user1.getUsername());
+                sharedEditor.apply();
 
-                    ProgressBarManager.dismissProgressBar();
-                    ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, "A user has signed in!");
-                    moveToPostListActivity();
-                } else {
-                    ProgressBarManager.dismissProgressBar();
-                    ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, "Failed to sign in user");
-                }
+                ProgressBarManager.dismissProgressBar();
+                ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, user1.getUsername() + " has signed in!");
+                moveToPostListActivity();
+            } else {
+                ProgressBarManager.dismissProgressBar();
+                ToastMessageDisplayer.displayToast(WelcomeScreenActivity.this, "Failed to sign in user");
             }
         });
     }

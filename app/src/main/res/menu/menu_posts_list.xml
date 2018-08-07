@@ -3,13 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.ben.meallennium.activities.PostsListActivity">
 
-    <item
-        android:id="@+id/actionMenu__search"
-        android:title="search menu"
-        android:icon="@drawable/search"
-        app:showAsAction="ifRoom|collapseActionView"
-        app:actionViewClass="android.support.v7.widget.SearchView" />
-
     <item android:title="Menu"
         app:showAsAction="always"
         android:icon="@drawable/more_options">

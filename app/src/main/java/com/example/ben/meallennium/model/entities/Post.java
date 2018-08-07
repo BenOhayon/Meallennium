@@ -39,7 +39,7 @@ public class Post implements Serializable{
         this(publisher, name, description, null);
     }
 
-    public Post(String publisher, String name, String description, String imageUrl) {
+    public Post(String publisher, @NonNull String name, String description, String imageUrl) {
         this.publisher = publisher;
         this.id = generatePostId();
         this.name = name;
@@ -59,10 +59,12 @@ public class Post implements Serializable{
         return sb.toString();
     }
 
+    @NonNull
     public String getId() {
         return id;
     }
 
+    @NonNull
     public String getName() {
         return name;
     }
@@ -73,10 +75,6 @@ public class Post implements Serializable{
 
     public String getPublisher() {
         return this.publisher;
-    }
-
-    public void setPublisher(String publisher) {
-        this.publisher = publisher;
     }
 
     public void setId(@NonNull String id) {

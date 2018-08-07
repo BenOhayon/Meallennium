@@ -1,8 +1,5 @@
 package com.example.ben.meallennium.activities;
 
-import android.app.SearchManager;
-import android.arch.lifecycle.MutableLiveData;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -17,27 +14,21 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.support.v7.widget.SearchView;
-import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
 import com.example.ben.meallennium.dialogs.DeleteAccountConfirmationDialog;
-import com.example.ben.meallennium.dialogs.DeletePostConfirmDialog;
 import com.example.ben.meallennium.dialogs.LogoutConfirmationDialog;
 import com.example.ben.meallennium.fragments.MyPostsListFragment;
 import com.example.ben.meallennium.fragments.PostsListFragment;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
-import com.example.ben.meallennium.model.firebase.FirebaseModel;
-import com.example.ben.meallennium.model.sql.PostAsyncDao;
 import com.example.ben.meallennium.utils.FragmentTransactions;
 import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.ProgressBarManager;
 import com.example.ben.meallennium.utils.Requests;
 import com.example.ben.meallennium.utils.Results;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Objects;
 
 public class PostsListActivity extends AppCompatActivity implements
         PostsListFragment.PostsListFragmentListener,
@@ -46,12 +37,9 @@ public class PostsListActivity extends AppCompatActivity implements
         LogoutConfirmationDialog.LogoutConfirmationDialogListener,
         PostsListFragment.OnSearchButtonClicked {
 
-    private ViewPager viewPager;
-    private PostsListFragment postsListFragment;
-
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -76,23 +64,18 @@ public class PostsListActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_posts_list);
 
         Model.setSignedInUser(getSharedPreferences("SP", MODE_PRIVATE).getString("userName", "default name"));
-
+        Log.d(LogTag.TAG, getSharedPreferences("SP", MODE_PRIVATE).getString("userName", "default name") + " has signed in");
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null) {
             actionBar.setTitle("Welcome, " + Model.getSignedInUser());
         }
 
         FloatingActionButton addFab = findViewById(R.id.postsListScreen__addFab);
-        addFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                moveToAddNewPostActivity();
-            }
-        });
+        addFab.setOnClickListener((View v) -> moveToAddNewPostActivity());
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        viewPager = findViewById(R.id.fragment_posts_list_container);
+        ViewPager viewPager = findViewById(R.id.fragment_posts_list_container);
         viewPager.setAdapter(sectionsPagerAdapter);
 
         TabLayout tabLayout = findViewById(R.id.tabs);
@@ -100,15 +83,8 @@ public class PostsListActivity extends AppCompatActivity implements
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
 
-        handleIntent(getIntent());
-
-        postsListFragment = new PostsListFragment();
+        PostsListFragment postsListFragment = new PostsListFragment();
         FragmentTransactions.createAndDisplayFragment(this, R.id.fragment_posts_list_container, postsListFragment, false);
-    }
-
-    @Override
-    public void onNewIntent(Intent intent) {
-        handleIntent(intent);
     }
 
     @Override
@@ -146,17 +122,8 @@ public class PostsListActivity extends AppCompatActivity implements
                 }
 
                 Model.instance.addPost(Model.getSignedInUser(),
-                        post, new FirebaseModel.OnCreateNewPostListener() {
-                            @Override
-                            public void onComplete(Post post) {
-                                ProgressBarManager.dismissProgressBar();
-                            }
-                        }, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
-                            @Override
-                            public void onComplete(Boolean result) {
-                                Log.d(LogTag.TAG, "New post " + post.getId() + " was added to local DB.");
-                            }
-                        });
+                        post, (Post post1) -> ProgressBarManager.dismissProgressBar(),
+                        (Boolean result) -> Log.d(LogTag.TAG, "New post " + post.getId() + " was added to local DB."));
             }
         }
     }
@@ -164,36 +131,21 @@ public class PostsListActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_posts_list, menu);
-
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.actionMenu__search).getActionView();
-        searchView.setQueryHint("Type a dish or restaurant");
-        if(searchManager != null) {
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        }
-
-        Log.d(LogTag.TAG, "postsListFragment = " + postsListFragment);
-
         return true;
     }
-
-    // --------------------
-    //   LISTENER METHODS
-    // --------------------
-
 
     /*
      * For the use of PostListAdapter
      */
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        Post selectedPost = Model.instance.getPostsData().getValue().get(clickedItemIndex);
+        Post selectedPost = Objects.requireNonNull(Model.instance.getPostsData().getValue()).get(clickedItemIndex);
         moveToPostDetailsActivity(selectedPost);
     }
 
     @Override
     public void onMyListItemClick(int clickedItemIndex) {
-        Post selectedPost = Model.instance.getMyPostsData().getValue().get(clickedItemIndex);
+        Post selectedPost = Objects.requireNonNull(Model.instance.getMyPostsData().getValue()).get(clickedItemIndex);
         moveToPostDetailsActivity(selectedPost);
     }
 
@@ -210,26 +162,6 @@ public class PostsListActivity extends AppCompatActivity implements
     @Override
     public void onYesClickedOnLogoutDialog() {
         finish();
-    }
-
-    // ----------------------------
-    //   PRIVATE & PUBLIC METHODS
-    // ----------------------------
-
-    /**
-     * Handles the action search intent that starts this activity whenever we wish
-     * to perform a search task in the activity.
-     *
-     * @param intent The intent to handle.
-     */
-    private void handleIntent(Intent intent) {
-        Log.d(LogTag.TAG, "Inside handleIntent()");
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            // TODO enter the search logic here.
-            String userInput = query.toLowerCase();
-
-        }
     }
 
     private void moveToPostDetailsActivity(Post selectedPost) {

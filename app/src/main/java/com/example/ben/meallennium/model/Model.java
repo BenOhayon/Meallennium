@@ -8,7 +8,6 @@ import android.os.Environment;
 import android.util.Log;
 import android.webkit.URLUtil;
 
-import com.example.ben.meallennium.activities.PostsListActivity;
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.model.firebase.FirebaseModel;
@@ -25,11 +24,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
-// TODO ask Eliav about fragments anf destroying views.
-// TODO Add search functionality. (ask Eliav)
-// TODO Add a message to be displayed when there's no posts in the list. (ask Eliav)
-// TODO Consider put the menu items as a navigation drawer items (??)
+// TODO ask Eliav about fragments and destroying views.
 
 public class Model {
 
@@ -49,29 +46,22 @@ public class Model {
     private static String SIGNED_IN_USERNAME;
 
     public class MyPostsListLiveData extends MutableLiveData<List<Post>> {
-        public MyPostsListLiveData() {
+        MyPostsListLiveData() {
             setValue(new LinkedList<>());
         }
 
         @Override
         protected void onActive() {
             super.onActive();
-            PostAsyncDao.getPostsByPublisher(SIGNED_IN_USERNAME,
-                    new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
-                        @Override
-                        public void onComplete(List<Post> result) {
-                            if (result.size() != 0) {
-                                setValue(result);
-                            } else {
-                                firebaseModel.fetchPostsByPublisher(SIGNED_IN_USERNAME, new FirebaseModel.OnFetchAllPostsListener() {
-                                    @Override
-                                    public void onComplete(List<Post> posts) {
-                                        if(posts != null) {
-                                            setValue(posts);
-                                        }
-                                    }
-                                });
-                            }
+            PostAsyncDao.getPostsByPublisher(SIGNED_IN_USERNAME, (List<Post> result) -> {
+                        if (result.size() != 0) {
+                            setValue(result);
+                        } else {
+                            firebaseModel.fetchPostsByPublisher(SIGNED_IN_USERNAME, (List<Post> posts) -> {
+                                if(posts != null) {
+                                    setValue(posts);
+                                }
+                            });
                         }
                     });
         }
@@ -79,54 +69,40 @@ public class Model {
 
     public class PostsListLiveData extends MutableLiveData<List<Post>> {
 
-        public PostsListLiveData() {
+        PostsListLiveData() {
             setValue(new LinkedList<>());
         }
 
         @Override
         protected void onActive() {
             super.onActive();
-            PostAsyncDao.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
-                @Override
-                public void onComplete(List<Post> postsFromDB) {
-                    setValue(postsFromDB);
-                    firebaseModel.fetchAllPosts(new FirebaseModel.OnFetchAllPostsListener() {
-                        @Override
-                        public void onComplete(List<Post> postsFromFirebase) {
-                            List<Post> temp = new LinkedList<>();
-                            temp.addAll(postsFromDB);
-                            List<Post> deltaPostsList = getDeltaList(postsFromDB, postsFromFirebase);
-                            if (deltaPostsList.size() != 0) {
-                                for (Post p : deltaPostsList) {
-                                    Post postById = getPostFromListById(temp, p.getId());
-                                    int postByIdIndex = temp.indexOf(postById);
-                                    if(postById != null) {
-                                        temp.remove(postById);
-                                    }
-
-                                    if (postByIdIndex > -1) {
-                                        temp.set(postByIdIndex, p);
-                                    } else {
-                                        temp.add(p);
-                                    }
-                                }
-                                setValue(temp);
+            PostAsyncDao.getAllPosts((List<Post> postsFromDB) -> {
+                setValue(postsFromDB);
+                firebaseModel.fetchAllPosts((List<Post> postsFromFirebase) -> {
+                    List<Post> temp = new LinkedList<>();
+                    temp.addAll(postsFromDB);
+                    List<Post> deltaPostsList = getDeltaList(postsFromDB, postsFromFirebase);
+                    if (deltaPostsList.size() != 0) {
+                        for (Post p : deltaPostsList) {
+                            Post postById = getPostFromListById(temp, p.getId());
+                            int postByIdIndex = temp.indexOf(postById);
+                            if(postById != null) {
+                                temp.remove(postById);
                             }
-                            ProgressBarManager.dismissProgressBar();
-                            PostAsyncDao.deleteAllPosts(postsFromDB, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
-                                @Override
-                                public void onComplete(Boolean result) {
-                                    PostAsyncDao.addPosts(temp, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
-                                        @Override
-                                        public void onComplete(Boolean result) {
-                                            Log.d(LogTag.TAG, "Posts saved in local DB");
-                                        }
-                                    });
-                                }
-                            });
+
+                            if (postByIdIndex > -1) {
+                                temp.set(postByIdIndex, p);
+                            } else {
+                                temp.add(p);
+                            }
                         }
-                    });
-                }
+                        setValue(temp);
+                    }
+                    ProgressBarManager.dismissProgressBar();
+                    PostAsyncDao.deleteAllPosts(postsFromDB,
+                            (Boolean result) -> PostAsyncDao.addPosts(temp,
+                            (Boolean result1) -> Log.d(LogTag.TAG, "Posts saved in local DB")));
+                });
             });
         }
 
@@ -146,38 +122,29 @@ public class Model {
     }
 
     public static void setSignedInUser(String username) {
-        if (SIGNED_IN_USERNAME == null) {
-            SIGNED_IN_USERNAME = username;
-        }
+        SIGNED_IN_USERNAME = username;
     }
 
     public static String getSignedInUser() {
         return SIGNED_IN_USERNAME;
     }
 
-    public void updatePost(String publisher, Post newPost) {
-        firebaseModel.updatePost(publisher, newPost);
+    public void updatePost(String publisher, Post oldPost, Post newPost) {
+        PostAsyncDao.deletePost(oldPost, (Boolean result) -> firebaseModel.createNewPost(publisher, newPost, null));
     }
 
     public void deletePost(Post post, final OnOperationCompleteListener listener) {
-        PostAsyncDao.deletePost(post, new PostAsyncDao.PostAsyncDaoListener<Boolean>() {
-            @Override
-            public void onComplete(Boolean result) {
-                firebaseModel.deletePost(SIGNED_IN_USERNAME, post, new FirebaseModel.OnDeletePostListener() {
-                    @Override
-                    public void onComplete() {
-                        Log.d(LogTag.TAG, "A post " + post.getId() + " was deleted from local DB successfully");
+        PostAsyncDao.deletePost(post,
+                (Boolean result) -> firebaseModel.deletePost(SIGNED_IN_USERNAME, post, () -> {
+                    Log.d(LogTag.TAG, "A post " + post.getId() + " was deleted from local DB successfully");
 
-                        Model.instance.postsData.getValue().remove(post);
-                        Model.instance.postsData.setValue(Model.instance.postsData.getValue());
+                    Objects.requireNonNull(Model.instance.postsData.getValue()).remove(post);
+                    Model.instance.postsData.setValue(Model.instance.postsData.getValue());
 
-                        if(listener != null) {
-                            listener.onComplete();
-                        }
+                    if(listener != null) {
+                        listener.onComplete();
                     }
-                });
-            }
-        });
+                }));
     }
 
     public void loadImage(String imageUrl, final OnFetchImageFromLocalCacheListener listener){
@@ -185,17 +152,14 @@ public class Model {
             String localFileName = URLUtil.guessFileName(imageUrl, null, null);
             final Bitmap image = fetchPostImageFromLocalCache(localFileName);
             if (image == null) {
-                firebaseModel.getImage(imageUrl, new FirebaseModel.OnGetImageListener() {
-                    @Override
-                    public void onDone(Bitmap pic) {
-                        if (pic == null) {
-                            listener.onComplete(null);
-                        } else {
-                            String localFileName = URLUtil.guessFileName(imageUrl, null, null);
-                            Log.d("TAG", "save image to cache: " + localFileName);
-                            savePostImageToLocalCache(pic, localFileName);
-                            listener.onComplete(pic);
-                        }
+                firebaseModel.getImage(imageUrl, (Bitmap pic) -> {
+                    if (pic == null) {
+                        listener.onComplete(null);
+                    } else {
+                        String localFileName1 = URLUtil.guessFileName(imageUrl, null, null);
+                        Log.d("TAG", "save image to cache: " + localFileName1);
+                        savePostImageToLocalCache(pic, localFileName1);
+                        listener.onComplete(pic);
                     }
                 });
             }else {
@@ -223,6 +187,7 @@ public class Model {
         return bitmap;
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void savePostImageToLocalCache(Bitmap imageBitmap, String imageUrl) {
         if (imageBitmap == null) return;
         try {
@@ -238,7 +203,6 @@ public class Model {
             imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.close();
 
-            //addPictureToGallery(imageFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -252,15 +216,6 @@ public class Model {
                         PostAsyncDao.PostAsyncDaoListener<Boolean> DBListener) {
         addPostToFirebase(publisher, post, firebaseListener);
         PostAsyncDao.addPost(post, DBListener);
-    }
-
-    public void getAllPostsFromLocalDB(FirebaseModel.OnFetchAllPostsListener listener) {
-        PostAsyncDao.getAllPosts(new PostAsyncDao.PostAsyncDaoListener<List<Post>>() {
-            @Override
-            public void onComplete(List<Post> result) {
-                listener.onComplete(result);
-            }
-        });
     }
 
     public void addUserToFirebase(User user, final FirebaseModel.OnCreateNewUserListener listener) {
@@ -279,7 +234,7 @@ public class Model {
         firebaseModel.signOutCurrentUser();
     }
 
-    public void deleteSignedInUserInFirebase(final FirebaseModel.OnUserDeleteListener listener) {
+    public void deleteUser(final FirebaseModel.OnUserDeleteListener listener) {
         firebaseModel.deleteSignedInUser(listener);
     }
 

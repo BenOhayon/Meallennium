@@ -21,9 +21,7 @@ public class AboutActivity extends AppCompatActivity {
         }
 
         Button OKButton = findViewById(R.id.aboutScreen__OKButton);
-        OKButton.setOnClickListener((View view) -> {
-            finish();
-        });
+        OKButton.setOnClickListener((View view) -> finish());
     }
 
     @Override

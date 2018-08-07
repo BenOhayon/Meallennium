@@ -4,11 +4,9 @@ package com.example.ben.meallennium.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.TextInputEditText;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,18 +18,14 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.example.ben.meallennium.R;
-import com.example.ben.meallennium.activities.PostsListActivity;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
-import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.utils.LogTag;
 import com.example.ben.meallennium.utils.Requests;
 import com.example.ben.meallennium.utils.ToastMessageDisplayer;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.function.UnaryOperator;
+import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -47,16 +41,13 @@ public class EditPostFragment extends Fragment {
 
     private ImageView postImage;
     private ProgressBar postImageProgressBar, centerProgressBar;
-    private Button takePictureButton, pickFromGalleryButton, OKButton, cancelButton;
     private EditText postNameEt, postDescEt;
     private Bitmap postImageBitmap;
 
     private OnCancelButtonClicked cancelListener;
     private OnEditCompleteListener editListener;
 
-    public EditPostFragment() {
-        // Required empty public constructor
-    }
+    public EditPostFragment() {}
 
     @Override
     public void onAttach(Context context) {
@@ -70,7 +61,7 @@ public class EditPostFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_post, container, false);
         initializeViewElements(view);
@@ -81,7 +72,7 @@ public class EditPostFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == Requests.IMAGE_CAPTURE_REQUEST && resultCode == RESULT_OK) {
             Log.d(LogTag.TAG, "Opening camera");
-            postImageBitmap = (Bitmap)data.getExtras().get("data");
+            postImageBitmap = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
             postImage.setImageBitmap(postImageBitmap);
             postImageProgressBar.setVisibility(View.GONE);
         }
@@ -90,7 +81,7 @@ public class EditPostFragment extends Fragment {
             Log.d(LogTag.TAG, "Getting from gallery");
             if(data != null) {
                 try{
-                    postImageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), data.getData());
+                    postImageBitmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), data.getData());
                     postImage.setImageBitmap(postImageBitmap);
                 } catch(IOException e) {
                     ToastMessageDisplayer.displayToast(getActivity(), e.getMessage());
@@ -105,82 +96,62 @@ public class EditPostFragment extends Fragment {
         postImageProgressBar.setVisibility(View.VISIBLE);
         centerProgressBar = view.findViewById(R.id.editPost__centerProgressBar);
 
-        takePictureButton = view.findViewById(R.id.editPost__takePictureButton);
-        pickFromGalleryButton = view.findViewById(R.id.editPost__pickFromGalleryButton);
-        OKButton = view.findViewById(R.id.editPost__OKButton);
-        cancelButton = view.findViewById(R.id.editPost__cancelButton);
+        Button takePictureButton = view.findViewById(R.id.editPost__takePictureButton);
+        Button pickFromGalleryButton = view.findViewById(R.id.editPost__pickFromGalleryButton);
+        Button OKButton = view.findViewById(R.id.editPost__OKButton);
+        Button cancelButton = view.findViewById(R.id.editPost__cancelButton);
 
         postNameEt = view.findViewById(R.id.editPost__postNameEt);
         postDescEt = view.findViewById(R.id.editPost__postDescTextArea);
 
         Bundle bundle = getArguments();
-        Post postToEdit = (Post)bundle.get("postToEdit");
-        postNameEt.setText(postToEdit.getName());
+        Post postToEdit = (Post) Objects.requireNonNull(bundle).get("postToEdit");
+        postNameEt.setText(Objects.requireNonNull(postToEdit).getName());
         postDescEt.setText(postToEdit.getDescription());
 
-        Model.instance.loadImage(postToEdit.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
-            @Override
-            public void onComplete(Bitmap pic) {
-                if (pic != null) {
-                    postImageBitmap = pic;
-                    postImage.setImageBitmap(pic);
-                } else {
-                    postImage.setImageResource(R.drawable.about);
+        Model.instance.loadImage(postToEdit.getImageUrl(), (Bitmap pic) -> {
+            if (pic != null) {
+                postImageBitmap = pic;
+                postImage.setImageBitmap(pic);
+            } else {
+                postImage.setImageResource(R.drawable.about);
+            }
+            postImageProgressBar.setVisibility(View.GONE);
+        });
+
+        takePictureButton.setOnClickListener((View v) -> {
+            Intent takePictureIntent = new Intent(
+                    MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(Objects.requireNonNull(getActivity()).getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, Requests.IMAGE_CAPTURE_REQUEST);
+            }
+        });
+
+        pickFromGalleryButton.setOnClickListener((View v) -> {
+            Intent chooseFromGallery = new Intent();
+            chooseFromGallery.setType("image/*");
+            chooseFromGallery.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(chooseFromGallery, "Select Picture"), Requests.IMAGE_FROM_GALLERY_REQUEST);
+        });
+
+        OKButton.setOnClickListener((View v) -> {
+            centerProgressBar.setVisibility(View.VISIBLE);
+            Model.instance.saveImage(postImageBitmap, (String url) -> {
+                Post newPost = new Post(Model.getSignedInUser(),
+                        postNameEt.getText().toString(),
+                        postDescEt.getText().toString());
+
+                newPost.setId(postToEdit.getId());
+
+                if(url != null) {
+                    newPost.setImageUrl(url);
                 }
-                postImageProgressBar.setVisibility(View.GONE);
-            }
+
+                Model.instance.updatePost(Model.getSignedInUser(), postToEdit, newPost);
+                editListener.onEditDone();
+            });
         });
 
-        takePictureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent takePictureIntent = new Intent(
-                        MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    startActivityForResult(takePictureIntent, Requests.IMAGE_CAPTURE_REQUEST);
-                }
-            }
-        });
-
-        pickFromGalleryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent chooseFromGallery = new Intent();
-                chooseFromGallery.setType("image/*");
-                chooseFromGallery.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(chooseFromGallery, "Select Picture"), Requests.IMAGE_FROM_GALLERY_REQUEST);
-            }
-        });
-
-        OKButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                centerProgressBar.setVisibility(View.VISIBLE);
-                Model.instance.saveImage(postImageBitmap, new FirebaseModel.OnSaveImageListener() {
-                    @Override
-                    public void onDone(String url) {
-                        Post newPost = new Post(Model.getSignedInUser(),
-                                postNameEt.getText().toString(),
-                                postDescEt.getText().toString());
-
-                        newPost.setId(postToEdit.getId());
-
-                        if(url != null) {
-                            newPost.setImageUrl(url);
-                        }
-
-                        Model.instance.updatePost(Model.getSignedInUser(), newPost);
-                        editListener.onEditDone();
-                    }
-                });
-            }
-        });
-
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancelListener.onCancel();
-            }
-        });
+        cancelButton.setOnClickListener((View v) -> cancelListener.onCancel());
     }
 }

@@ -9,6 +9,8 @@ import android.support.v4.app.DialogFragment;
 
 import com.example.ben.meallennium.model.Model;
 
+import java.util.Objects;
+
 public class LogoutConfirmationDialog extends DialogFragment {
 
     public interface LogoutConfirmationDialogListener {
@@ -24,19 +26,11 @@ public class LogoutConfirmationDialog extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Are you sure you want to logout?")
-                .setNegativeButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Model.instance.signOutCurrentUserFromFirebase();
-                        listener.onYesClickedOnLogoutDialog();
-                    }
+                .setNegativeButton("Yes", (DialogInterface dialog, int which) -> {
+                    Model.instance.signOutCurrentUserFromFirebase();
+                    Objects.requireNonNull(listener).onYesClickedOnLogoutDialog();
                 })
-                .setPositiveButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
+                .setPositiveButton("No", (DialogInterface dialog, int which) -> {});
 
         return builder.create();
     }

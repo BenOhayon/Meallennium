@@ -10,8 +10,6 @@ import java.util.List;
 
 public class MyPostsListViewModel extends ViewModel {
 
-    LiveData<List<Post>> myPostsData;
-
     public LiveData<List<Post>> getMyPostsData() {
         return Model.instance.getMyPostsData();
     }

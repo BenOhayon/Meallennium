@@ -1,13 +1,11 @@
 package com.example.ben.meallennium.fragments;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,19 +13,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.ben.meallennium.R;
+import com.example.ben.meallennium.activities.SearchResultsActivity;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.viewmodels.MyPostsListViewModel;
 import com.example.ben.meallennium.utils.LogTag;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
+import java.util.Objects;
 
 public class MyPostsListFragment extends Fragment {
 
@@ -35,17 +35,14 @@ public class MyPostsListFragment extends Fragment {
         void onMyListItemClick(int clickedItemIndex);
     }
 
-    private MyPostsListViewModel postsViewModel;
     private MyPostsListAdapter adapter;
-    private TextView startMessage;
-
-    private MyPostsListFragmentListener listener;
+    private PostsListFragment.OnSearchButtonClicked searchListener;
 
     class MyPostsListAdapter extends RecyclerView.Adapter<MyPostsListAdapter.PostViewHolder> {
 
         private MyPostsListFragmentListener listener;
 
-        public MyPostsListAdapter(MyPostsListFragmentListener listener) {
+        MyPostsListAdapter(MyPostsListFragmentListener listener) {
             this.listener = listener;
         }
 
@@ -65,9 +62,7 @@ public class MyPostsListFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            Log.d(LogTag.TAG, "getting the size of My Post List...");
-
-            return Model.instance.getMyPostsData().getValue().size();
+            return Objects.requireNonNull(Model.instance.getMyPostsData().getValue()).size();
         }
 
 
@@ -87,21 +82,18 @@ public class MyPostsListFragment extends Fragment {
 
             private void bind(int listIndex) {
                 imageProgressBar.setVisibility(View.VISIBLE);
-                Post post = Model.instance.getMyPostsData().getValue().get(listIndex);
+                Post post = Objects.requireNonNull(Model.instance.getMyPostsData().getValue()).get(listIndex);
                 postItemName.setText(post.getName());
 
                 if (post.getImageUrl() != null) {
-                    Model.instance.loadImage(post.getImageUrl(), new Model.OnFetchImageFromLocalCacheListener() {
-                        @Override
-                        public void onComplete(Bitmap pic) {
-                            Log.d(LogTag.TAG, "Retrieving picture from local cache");
-                            if (pic != null) {
-                                postImage.setImageBitmap(pic);
-                            } else {
-                                postImage.setImageResource(R.drawable.about);
-                            }
-                            imageProgressBar.setVisibility(View.GONE);
+                    Model.instance.loadImage(post.getImageUrl(), (Bitmap pic) -> {
+                        Log.d(LogTag.TAG, "Retrieving picture from local cache");
+                        if (pic != null) {
+                            postImage.setImageBitmap(pic);
+                        } else {
+                            postImage.setImageResource(R.drawable.about);
                         }
+                        imageProgressBar.setVisibility(View.GONE);
                     });
                 } else {
                     postImage.setImageResource(R.drawable.about);
@@ -135,44 +127,38 @@ public class MyPostsListFragment extends Fragment {
         postsList.setHasFixedSize(true);
         adapter = new MyPostsListAdapter((MyPostsListFragmentListener) getActivity());
         postsList.setAdapter(adapter);
+        Button searchButton = view.findViewById(R.id.postsListScreen__searchButton);
+        EditText searchQuery = view.findViewById(R.id.postsListScreen__searchQuery);
+
+        searchButton.setOnClickListener((View v) -> {
+            if (!searchQuery.getText().toString().equals("")) {
+                Intent toSearchResults = new Intent(getActivity(), SearchResultsActivity.class);
+                Log.d(LogTag.TAG, "search query: " + searchQuery.getText().toString());
+                toSearchResults.putExtra("query", searchQuery.getText().toString());
+                toSearchResults.putExtra("list", 1);
+                searchQuery.setText("");
+                searchListener.onSearchButtonClick(toSearchResults);
+            }
+        });
 
         return view;
     }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        if(Model.instance.getPostsData().getValue().size() != 0) {
-//            startMessage.setVisibility(View.GONE);
-//        } else {
-//            startMessage.setVisibility(View.VISIBLE);
-//        }
-//    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if(context instanceof MyPostsListFragmentListener) {
-            listener = (MyPostsListFragmentListener) context;
+        if(context instanceof PostsListFragment.OnSearchButtonClicked) {
+            searchListener = (PostsListFragment.OnSearchButtonClicked) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement MyPostsListFragmentListener");
+                    + " must implement OnSearchButtonClicked");
         }
 
-        postsViewModel = ViewModelProviders.of(this).get(MyPostsListViewModel.class);
-        postsViewModel.getMyPostsData().observe(this, new Observer<List<Post>>() {
-            @Override
-            public void onChanged(@Nullable List<Post> posts) {
-                adapter.notifyDataSetChanged();
-                Log.d(LogTag.TAG, "LiveData has updated");
-            }
+        MyPostsListViewModel postsViewModel = ViewModelProviders.of(this).get(MyPostsListViewModel.class);
+        postsViewModel.getMyPostsData().observe(this, (List<Post> posts) -> {
+            adapter.notifyDataSetChanged();
+            Log.d(LogTag.TAG, "LiveData has updated");
         });
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
     }
 }
