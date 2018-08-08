@@ -9,7 +9,6 @@ import android.util.Log;
 import com.example.ben.meallennium.model.entities.Post;
 import com.example.ben.meallennium.model.entities.User;
 import com.example.ben.meallennium.utils.LogTag;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -126,10 +125,14 @@ public class FirebaseModel {
     }
 
     public void registerNewUser(User user, final OnCreateNewUserListener listener) {
+        DatabaseReference newUserRef = dbRef.child("Users").child(user.getUsername());
+        newUserRef.setValue(user);
+
         auth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
                 .addOnCompleteListener((Task<AuthResult> task) -> {
                     if(task.isSuccessful()) {
                         Log.d(LogTag.TAG, "Firebase registration successful!");
+                        signedInUser = user;
                         listener.onCreationComplete(user);
                     } else {
                         Log.d(LogTag.TAG, "Firebase registration failed: " + task.getException());
@@ -143,8 +146,8 @@ public class FirebaseModel {
                 .addOnCompleteListener((Task<AuthResult> task) -> {
                     if(task.isSuccessful()) {
                         Log.d(LogTag.TAG, "Firebase sign in successful!");
-                        listener.onSignInComplete(user);
                         signedInUser = user;
+                        listener.onSignInComplete(user);
                     } else {
                         Log.d(LogTag.TAG, "Firebase sign in failed: " + task.getException());
                         listener.onSignInComplete(null);

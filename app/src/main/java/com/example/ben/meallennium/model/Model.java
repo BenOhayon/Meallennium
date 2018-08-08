@@ -26,8 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-// TODO ask Eliav about fragments and destroying views.
-
 public class Model {
 
     public interface OnOperationCompleteListener {
@@ -79,28 +77,13 @@ public class Model {
             PostAsyncDao.getAllPosts((List<Post> postsFromDB) -> {
                 setValue(postsFromDB);
                 firebaseModel.fetchAllPosts((List<Post> postsFromFirebase) -> {
-                    List<Post> temp = new LinkedList<>();
-                    temp.addAll(postsFromDB);
-                    List<Post> deltaPostsList = getDeltaList(postsFromDB, postsFromFirebase);
-                    if (deltaPostsList.size() != 0) {
-                        for (Post p : deltaPostsList) {
-                            Post postById = getPostFromListById(temp, p.getId());
-                            int postByIdIndex = temp.indexOf(postById);
-                            if(postById != null) {
-                                temp.remove(postById);
-                            }
-
-                            if (postByIdIndex > -1) {
-                                temp.set(postByIdIndex, p);
-                            } else {
-                                temp.add(p);
-                            }
-                        }
-                        setValue(temp);
+                    if(postsFromFirebase != null && postsFromFirebase.size() != 0) {
+                        setValue(postsFromFirebase);
                     }
+
                     ProgressBarManager.dismissProgressBar();
                     PostAsyncDao.deleteAllPosts(postsFromDB,
-                            (Boolean result) -> PostAsyncDao.addPosts(temp,
+                            (Boolean result) -> PostAsyncDao.addPosts(postsFromFirebase,
                             (Boolean result1) -> Log.d(LogTag.TAG, "Posts saved in local DB")));
                 });
             });
@@ -214,11 +197,11 @@ public class Model {
 
     public void addPost(String publisher, Post post, final FirebaseModel.OnCreateNewPostListener firebaseListener,
                         PostAsyncDao.PostAsyncDaoListener<Boolean> DBListener) {
-        addPostToFirebase(publisher, post, firebaseListener);
+        firebaseModel.createNewPost(publisher, post, firebaseListener);
         PostAsyncDao.addPost(post, DBListener);
     }
 
-    public void addUserToFirebase(User user, final FirebaseModel.OnCreateNewUserListener listener) {
+    public void addUser(User user, final FirebaseModel.OnCreateNewUserListener listener) {
         firebaseModel.registerNewUser(user, listener);
     }
 
@@ -248,28 +231,5 @@ public class Model {
 
     public LiveData<List<Post>> getMyPostsData() {
         return myPostsData;
-    }
-
-    private void addPostToFirebase(String publisher, Post post, final FirebaseModel.OnCreateNewPostListener listener) {
-        firebaseModel.createNewPost(publisher, post, listener);
-    }
-
-    private List<Post> getDeltaList(List<Post> source, List<Post> getDeltaFrom) {
-        List<Post> deltaList = new LinkedList<>();
-        for(Post p : getDeltaFrom) {
-            if(!source.contains(p)) {
-                deltaList.add(p);
-            }
-        }
-        return deltaList;
-    }
-
-    private Post getPostFromListById(List<Post> temp, String id) {
-        for(Post p : temp) {
-            if(p.getId().equals(id))
-                return p;
-        }
-
-        return null;
     }
 }

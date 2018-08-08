@@ -98,10 +98,6 @@ public class PostsListActivity extends AppCompatActivity implements
                 Intent toAboutScreen = new Intent(this, AboutActivity.class);
                 startActivity(toAboutScreen);
                 break;
-
-            case R.id.actionMenu__deleteAccount:
-                new DeleteAccountConfirmationDialog().show(getSupportFragmentManager(), "TAG");
-                break;
         }
 
         return true;

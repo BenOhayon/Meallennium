@@ -30,7 +30,6 @@ public class DeleteAccountConfirmationDialog extends DialogFragment {
         builder.setMessage("Are you sure you want to delete the account?")
                 .setNegativeButton("Yes", (DialogInterface dialog, int which) ->
                         Model.instance.deleteUser((User user) -> {
-                            Model.instance.setSignedInUserInFirebase(null);
                             Objects.requireNonNull(listener).onYesClickedOnDeleteAccountDialog();
                             dismiss();
                         }))

@@ -24,16 +24,6 @@
                     app:showAsAction="never"
                     android:icon="@drawable/logout1"/>
             </group>
-
-            <group
-                android:id="@+id/group2">
-                <item
-                    android:id="@+id/actionMenu__deleteAccount"
-                    android:orderInCategory="100"
-                    android:title="Delete Account"
-                    app:showAsAction="never"
-                    android:icon="@drawable/trash"/>
-            </group>
         </menu>
     </item>
 </menu>

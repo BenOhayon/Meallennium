@@ -40,6 +40,7 @@ public class PostsListFragment extends Fragment {
     }
 
     private PostsListAdapter adapter;
+    private PostsListViewModel postsViewModel;
     private OnSearchButtonClicked searchClickListener;
 
     class PostsListAdapter extends RecyclerView.Adapter<PostsListAdapter.PostViewHolder> {
@@ -162,7 +163,7 @@ public class PostsListFragment extends Fragment {
                     + " must implement OnSearchButtonClicked");
         }
 
-        PostsListViewModel postsViewModel = ViewModelProviders.of(this).get(PostsListViewModel.class);
+        postsViewModel = ViewModelProviders.of(this).get(PostsListViewModel.class);
         postsViewModel.getPostsData().observe(this, (List<Post> posts) -> {
             adapter.notifyDataSetChanged();
             Log.d(LogTag.TAG, "LiveData has updated");

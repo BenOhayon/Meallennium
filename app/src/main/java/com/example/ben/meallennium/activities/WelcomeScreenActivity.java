@@ -12,7 +12,6 @@ import com.example.ben.meallennium.fragments.RegistrationFragment;
 import com.example.ben.meallennium.fragments.WelcomeScreenFragment;
 import com.example.ben.meallennium.model.Model;
 import com.example.ben.meallennium.model.entities.User;
-import com.example.ben.meallennium.model.firebase.FirebaseModel;
 import com.example.ben.meallennium.utils.FragmentTransactions;
 import com.example.ben.meallennium.utils.LoginControllerListener;
 import com.example.ben.meallennium.utils.ProgressBarManager;
@@ -60,7 +59,7 @@ public class WelcomeScreenActivity extends AppCompatActivity implements
 
     @Override
     public void onRegister(User user) {
-        Model.instance.addUserToFirebase(user, (User user1) -> {
+        Model.instance.addUser(user, (User user1) -> {
             if(user1 != null) {
                 Model.instance.setSignedInUserInFirebase(user1);
 
